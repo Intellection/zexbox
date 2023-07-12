@@ -1,4 +1,4 @@
-defmodule FeatureFlags do
+defmodule Exbox.Flags do
   @moduledoc """
   An Elixir wrapper around the LaunchDarkly Erlang client
   """

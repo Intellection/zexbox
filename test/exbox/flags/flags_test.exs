@@ -1,6 +1,7 @@
-defmodule FeatureFlagsTest do
+defmodule Exbox.FlagsTest do
   use ExUnit.Case
   import ExUnit.CaptureLog
+  alias Exbox.Flags
   require Logger
 
   defp start_client(tag) do
@@ -35,23 +36,23 @@ defmodule FeatureFlagsTest do
     %{config_map: config_map, tag: tag}
   end
 
-  describe "FeatureFlags.start/1" do
+  describe "Flags.start/1" do
     test "when no ldclient instance has been started", %{config_map: config_map, tag: tag} do
       # Need to stop the client here first
       stop_client(tag)
-      assert :ok == FeatureFlags.start(config_map, tag)
+      assert :ok == Flags.start(config_map, tag)
     end
 
     test "when an ldclient instance has already been started", %{config_map: config_map, tag: tag} do
-      assert {:error, {:already_started, _pid}} = FeatureFlags.start(config_map, tag)
+      assert {:error, {:already_started, _pid}} = Flags.start(config_map, tag)
     end
   end
 
-  describe "FeatureFlags.variation/4" do
+  describe "Flags.variation/4" do
     # test "when flag exists", %{tag: tag} do
     #   Process.sleep(300)
 
-    #   assert FeatureFlags.variation(
+    #   assert Flags.variation(
     #            "dummy-flag",
     #            %{key: "context-key"},
     #            "a-default",
@@ -64,7 +65,7 @@ defmodule FeatureFlagsTest do
 
       {result, _warning} =
         with_log(fn ->
-          FeatureFlags.variation(
+          Flags.variation(
             "foo",
             %{key: "context-key"},
             "a-default",
@@ -76,8 +77,8 @@ defmodule FeatureFlagsTest do
     end
   end
 
-  test "FeatureFlags.stop/1", %{tag: tag} do
-    assert :ok == FeatureFlags.stop(tag)
+  test "Flags.stop/1", %{tag: tag} do
+    assert :ok == Flags.stop(tag)
     assert :ok == start_client(tag)
   end
 end
