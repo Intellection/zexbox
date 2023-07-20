@@ -27,6 +27,8 @@ defmodule Exbox.MixProject do
     [
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:ldclient, "~> 2.0", hex: :launchdarkly_server_sdk},
+      {:instream, "~> 2.2"},
+      {:telemetry, "~> 1.2.1"},
       {:ex_doc, "~> 0.16", only: :dev, runtime: false}
     ]
   end
