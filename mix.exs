@@ -26,7 +26,8 @@ defmodule Exbox.MixProject do
   defp deps do
     [
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
-      {:ldclient, "~> 2.0", hex: :launchdarkly_server_sdk}
+      {:ldclient, "~> 2.0", hex: :launchdarkly_server_sdk},
+      {:ex_doc, "~> 0.16", only: :dev, runtime: false}
     ]
   end
 
