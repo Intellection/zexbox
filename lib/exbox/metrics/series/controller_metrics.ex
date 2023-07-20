@@ -1,6 +1,24 @@
 defmodule Exbox.Metrics.Series.ControllerMetrics do
   @moduledoc """
   This module defines generic controller metrics.
+
+  The fields captured are:
+
+  * duration_ms - The time taken to process the request in milliseconds
+  * duration_db_ms - The time taken to process the request in milliseconds, excluding time spent in the database
+  * success - Whether the request was successful (1.0) or not (0.0)
+  * path - The path of the request
+  * http_referer - The referer of the request
+  * count - The number of requests
+  * request_id - The request ID of the request
+
+  The tags allowed are:
+
+  * controller - The name of the controller
+  * action - The name of the action
+  * method - The HTTP method of the request
+  * format - The format of the request
+  * status - The status of the request
   """
   use Instream.Series
 

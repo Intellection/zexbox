@@ -9,6 +9,11 @@ defmodule Exbox.Metrics.MetricHandler do
   @doc """
   This function is called by the Phoenix endpoint when a controller action is
   finished. It will log the controller metrics to influx.
+
+  Examples:
+
+      iex> Exbox.Metrics.MetricHandler.handle_event([:phoenix, :endpoint, :stop], measurements, metadata, config)
+      :ok
   """
   @spec handle_event(list(atom), map, map, map) :: any()
   def handle_event([:phoenix, :endpoint, :stop], measurements, metadata, config) do

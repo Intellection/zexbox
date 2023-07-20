@@ -9,6 +9,11 @@ defmodule Exbox.Metrics.Client do
 
   @doc """
   Write a metric to InfluxDB.
+
+  Examples:
+
+      iex> Exbox.Metrics.Client.write_metric(%ControllerMetrics{})
+      {:ok, %ControllerMetrics{}}
   """
   @spec write_metric(series()) :: tuple()
   def write_metric(metric) do
