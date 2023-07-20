@@ -7,7 +7,11 @@ defmodule Exbox.MixProject do
       version: "0.1.0",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      description: description(),
+      package: package(),
+      deps: deps(),
+      name: "Exbox",
+      source_url: "https://github.com/Intellection/exbox"
     ]
   end
 
@@ -23,6 +27,18 @@ defmodule Exbox.MixProject do
     [
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:ldclient, "~> 2.0", hex: :launchdarkly_server_sdk}
+    ]
+  end
+
+  defp description() do
+    "Common tooling and functionality for our Elixir applications"
+  end
+
+  defp package() do
+    [
+      files: ~w(lib .formatter.exs mix.exs README*),
+      licenses: ["Apache-2.0"],
+      organization: "zappi"
     ]
   end
 end
