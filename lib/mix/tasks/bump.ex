@@ -12,6 +12,7 @@ defmodule Mix.Tasks.Bump do
     new_version = bump(version, level)
     update_version(new_version)
     commit_changes(new_version)
+    push_changes()
     create_tag(new_version)
     push_tag(new_version)
   end
@@ -22,7 +23,6 @@ defmodule Mix.Tasks.Bump do
 
     case current_branch do
       {"main\n", _} -> :ok
-      {"master\n", _} -> :ok
       {_, _} -> raise "Not on main branch"
     end
   end
@@ -35,6 +35,11 @@ defmodule Mix.Tasks.Bump do
   defp create_tag(new_version) do
     IO.puts("Creating tag #{new_version}")
     system("git tag -a #{new_version} -m \"Version #{new_version}\"")
+  end
+
+  defp push_changes() do
+    IO.puts("Pushing changes")
+    system("git push origin main")
   end
 
   defp commit_changes(new_version) do
