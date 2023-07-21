@@ -64,13 +64,16 @@ defmodule Mix.Tasks.Bump do
 
   defp commit_changes(new_version) do
     IO.puts("Committing changes")
-    system("git add mix.exs")
-    system("git commit -m \"Bump version to #{new_version}\"")
+    system("git add #{File.cwd!()}/mix.exs")
+    system("git commit -m\"Bump version to #{new_version}\"")
     {:ok, "Committed changes"}
   end
 
   defp system(command) do
-    case System.cmd("sh", ["-c", command]) do
+    system_result = System.cmd("sh", ["-c", command])
+
+    case system_result do
+      {_, 0} -> :ok
       {0, _} -> :ok
       {_, _} -> raise "Command failed: #{command}"
     end
