@@ -9,13 +9,19 @@ defmodule Mix.Tasks.Bump do
     {parsed, _, _} = OptionParser.parse(args, strict: [level: :string])
     level = parsed[:level]
     version = Mix.Project.config()[:version]
-    new_version = bump(version, level)
-    confirm_changes(new_version)
-    update_version(new_version)
-    commit_changes(new_version)
-    push_changes()
-    create_tag(new_version)
-    push_tag(new_version)
+
+    with {:ok, new_version} <- bump(version, level),
+         {:ok, _} <- confirm_changes(new_version),
+         {:ok, _} <- update_version(new_version),
+         {:ok, _} <- commit_changes(new_version),
+         {:ok, _} <- push_changes(),
+         {:ok, _} <- create_tag(new_version),
+         {:ok, _} <- push_tag(new_version) do
+      IO.puts("Bumped version from #{version} to #{new_version}")
+      :ok
+    else
+      {:error, reason} -> IO.puts(reason)
+    end
   end
 
   defp confirm_changes(new_version) do
@@ -23,8 +29,8 @@ defmodule Mix.Tasks.Bump do
     IO.puts("Continue? (y/n)")
 
     case IO.gets("") do
-      "y\n" -> :ok
-      _ -> raise "Aborted"
+      "y\n" -> {:ok, new_version}
+      _ -> {:error, "Aborted"}
     end
   end
 
@@ -33,7 +39,7 @@ defmodule Mix.Tasks.Bump do
     current_branch = System.cmd("git", ["branch", "--show-current"])
 
     case current_branch do
-      {"main\n", _} -> :ok
+      {"main\n", _} -> {:ok, current_branch}
       {_, _} -> raise "Not on main branch"
     end
   end
@@ -41,22 +47,26 @@ defmodule Mix.Tasks.Bump do
   defp push_tag(new_version) do
     IO.puts("Pushing tag #{new_version}")
     system("git push origin #{new_version}")
+    {:ok, new_version}
   end
 
   defp create_tag(new_version) do
     IO.puts("Creating tag #{new_version}")
     system("git tag -a #{new_version} -m \"Version #{new_version}\"")
+    {:ok, new_version}
   end
 
   defp push_changes() do
     IO.puts("Pushing changes")
     system("git push origin main")
+    {:ok, "Pushed changes"}
   end
 
   defp commit_changes(new_version) do
     IO.puts("Committing changes")
     system("git add mix.exs")
     system("git commit -m \"Bump version to #{new_version}\"")
+    {:ok, "Committed changes"}
   end
 
   defp system(command) do
@@ -74,14 +84,15 @@ defmodule Mix.Tasks.Bump do
       Regex.replace(~r/version: \"\d+\.\d+\.\d+\"/, mix_exs, "version: \"#{new_version}\"")
 
     File.write!("mix.exs", new_mix_exs)
+    {:ok, new_version}
   end
 
   defp bump(version, level) do
     case level do
-      "major" -> bump_major(version)
-      "minor" -> bump_minor(version)
-      "patch" -> bump_patch(version)
-      _ -> raise "Invalid bump level"
+      "major" -> {:ok, bump_major(version)}
+      "minor" -> {:ok, bump_minor(version)}
+      "patch" -> {:ok, bump_patch(version)}
+      _ -> {:error, "Invalid bump level"}
     end
   end
 
