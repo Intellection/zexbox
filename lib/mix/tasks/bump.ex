@@ -5,7 +5,7 @@ defmodule Mix.Tasks.Bump do
 
   @spec run([binary]) :: :ok
   def run(args) do
-    check_main_branch()
+    check_master_branch()
     {parsed, _, _} = OptionParser.parse(args, strict: [level: :string])
     level = parsed[:level]
     version = Mix.Project.config()[:version]
@@ -34,13 +34,13 @@ defmodule Mix.Tasks.Bump do
     end
   end
 
-  defp check_main_branch() do
+  defp check_master_branch() do
     IO.puts("Checking current branch")
     current_branch = System.cmd("git", ["branch", "--show-current"])
 
     case current_branch do
-      {"main\n", _} -> {:ok, current_branch}
-      {_, _} -> raise "Not on main branch"
+      {"master\n", _} -> {:ok, current_branch}
+      {_, _} -> raise "Not on master branch"
     end
   end
 
@@ -58,7 +58,7 @@ defmodule Mix.Tasks.Bump do
 
   defp push_changes() do
     IO.puts("Pushing changes")
-    system("git push origin main")
+    system("git push origin master")
     {:ok, "Pushed changes"}
   end
 
