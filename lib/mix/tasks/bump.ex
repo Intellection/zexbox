@@ -10,11 +10,22 @@ defmodule Mix.Tasks.Bump do
     level = parsed[:level]
     version = Mix.Project.config()[:version]
     new_version = bump(version, level)
+    confirm_changes(new_version)
     update_version(new_version)
     commit_changes(new_version)
     push_changes()
     create_tag(new_version)
     push_tag(new_version)
+  end
+
+  defp confirm_changes(new_version) do
+    IO.puts("Bumping version from #{Mix.Project.config()[:version]} to #{new_version}")
+    IO.puts("Continue? (y/n)")
+
+    case IO.gets("") do
+      "y\n" -> :ok
+      _ -> raise "Aborted"
+    end
   end
 
   defp check_main_branch() do
