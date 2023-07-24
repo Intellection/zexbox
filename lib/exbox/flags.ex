@@ -32,7 +32,9 @@ defmodule Exbox.Flags do
   """
   @spec start() :: :ok | {:error, atom(), term()}
   def start do
-    start(Application.fetch_env!(:exbox, :flags), :default)
+    Application.fetch_env!(:exbox, :flags)
+    |> Enum.into(%{})
+    |> start(:default)
   end
 
   @spec start(map(), atom()) :: :ok | {:error, atom(), term()}
