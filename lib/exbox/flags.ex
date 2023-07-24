@@ -30,6 +30,11 @@ defmodule Exbox.Flags do
         iex> Exbox.Flags.start(%{sdk_key: "sdk-key"}, :my_tag)
         {:error, {:already_started, #PID<0.602.0>}}
   """
+  @spec start() :: :ok | {:error, atom(), term()}
+  def start do
+    start(Application.fetch_env!(:exbox, :flags), :default)
+  end
+
   @spec start(map(), atom()) :: :ok | {:error, atom(), term()}
   def start(%{sdk_key: sdk_key} = config, tag) do
     sdk_key
