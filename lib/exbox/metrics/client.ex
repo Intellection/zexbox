@@ -17,9 +17,6 @@ defmodule Exbox.Metrics.Client do
   """
   @spec write_metric(series()) :: tuple()
   def write_metric(metric = %Exbox.Metrics.Series.Generic{}) do
-    require IEx
-    IEx.pry()
-
     metric
     |> Map.from_struct()
     |> write_to_influx()
