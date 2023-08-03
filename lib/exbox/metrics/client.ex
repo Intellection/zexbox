@@ -23,7 +23,7 @@ defmodule Exbox.Metrics.Client do
       end
     rescue
       error ->
-        Logger.error("Failed to write metric to InfluxDB: #{inspect(error)}")
+        Logger.debug("Failed to write metric to InfluxDB: #{inspect(error)}")
     end
   end
 end

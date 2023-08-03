@@ -40,7 +40,7 @@ defmodule Exbox.Metrics.MetricHandler do
       |> write_metric(config)
     rescue
       exception ->
-        Logger.error("Exception creating controller series: #{inspect(exception)}")
+        Logger.debug("Exception creating controller series: #{inspect(exception)}")
     end
   end
 
