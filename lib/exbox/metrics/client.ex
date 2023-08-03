@@ -18,9 +18,7 @@ defmodule Exbox.Metrics.Client do
   @spec write_metric(series()) :: tuple()
   def write_metric(metric) do
     try do
-      if Application.get_env(:exbox, :capture_telemetry_events) do
-        Connection.write(metric)
-      end
+      Connection.write(metric)
     rescue
       error ->
         Logger.debug("Failed to write metric to InfluxDB: #{inspect(error)}")
