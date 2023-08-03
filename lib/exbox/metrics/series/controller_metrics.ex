@@ -5,7 +5,6 @@ defmodule Exbox.Metrics.Series.ControllerMetrics do
   The fields captured are:
 
   * duration_ms - The time taken to process the request in milliseconds
-  * duration_db_ms - The time taken to process the request in milliseconds, excluding time spent in the database
   * success - Whether the request was successful (1.0) or not (0.0)
   * path - The path of the request
   * http_referer - The referer of the request
@@ -32,10 +31,10 @@ defmodule Exbox.Metrics.Series.ControllerMetrics do
     tag(:status)
 
     field(:duration_ms)
-    field(:duration_db_ms)
     field(:success)
     field(:path)
     field(:http_referer)
+    field(:trace_id)
     field(:count)
     field(:request_id)
   end

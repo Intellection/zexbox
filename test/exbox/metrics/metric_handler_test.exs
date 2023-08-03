@@ -33,7 +33,7 @@ defmodule Exbox.Metrics.MetricHandlerTest do
     expected = %ControllerMetrics{
       fields: %Exbox.Metrics.Series.ControllerMetrics.Fields{
         count: 1,
-        duration_db_ms: nil,
+        trace_id: "empty_for_now",
         duration_ms: 1000,
         http_referer: "https://www.google.com",
         path: "/",
