@@ -48,12 +48,12 @@ defmodule Exbox.Metrics.MetricHandler do
     end
   end
 
-  def write_metric(metric, %{metric_client: client}) do
+  defp write_metric(metric, %{metric_client: client}) do
     metric
     |> client.write_metric()
   end
 
-  def write_metric(metric, _config) do
+  defp write_metric(metric, _config) do
     metric
     |> Client.write_metric()
   end
