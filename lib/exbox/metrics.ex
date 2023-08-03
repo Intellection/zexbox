@@ -37,7 +37,11 @@ defmodule Exbox.Metrics do
   """
   @spec attach_controller_metrics() :: :ok
   def attach_controller_metrics do
-    attach_telemetry("phoenix_controller_metrics", [:phoenix, :endpoint, :stop])
+    attach_telemetry(
+      "phoenix_controller_metrics",
+      [:phoenix, :endpoint, :stop],
+      &MetricHandler.handle_event/4
+    )
   end
 
   @doc """
@@ -48,14 +52,14 @@ defmodule Exbox.Metrics do
       iex> Exbox.Metrics.attach_telemetry(:my_event, [:my, :params])
       :ok
   """
-  @spec attach_telemetry(binary(), list(atom())) :: :ok
-  def attach_telemetry(event, params) do
+  @spec attach_telemetry(binary(), list(atom()), (any() -> any())) :: :ok
+  def attach_telemetry(event, params, function) do
     if Application.get_env(:exbox, :capture_telemetry_events) do
       :ok =
         :telemetry.attach(
           event,
           params,
-          &MetricHandler.handle_event/4,
+          function,
           nil
         )
     end

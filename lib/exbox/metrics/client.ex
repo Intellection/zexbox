@@ -16,9 +16,22 @@ defmodule Exbox.Metrics.Client do
       {:ok, %ControllerMetrics{}}
   """
   @spec write_metric(series()) :: tuple()
-  def write_metric(metric) do
+  def write_metric(metric = %Exbox.Metrics.Series.Generic{}) do
+    require IEx
+    IEx.pry()
+
+    metric
+    |> Map.from_struct()
+    |> write_to_influx()
+  end
+
+  @spec write_metric(series()) :: tuple()
+  def write_metric(metric), do: write_to_influx(metric)
+
+  defp write_to_influx(metric) do
     try do
-      Connection.write(metric)
+      metric
+      |> Connection.write()
     rescue
       error ->
         Logger.debug("Failed to write metric to InfluxDB: #{inspect(error)}")
