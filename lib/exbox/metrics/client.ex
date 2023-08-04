@@ -1,7 +1,55 @@
 defmodule Exbox.Metrics.Client do
   @moduledoc """
-  Client for writing metrics to InfluxDB.
+  A client module for writing metrics to InfluxDB.
+
+  ## Overview
+
+  This module provides functions to write metrics to InfluxDB, a time-series database that allows for efficient storage and querying of data with a timestamp.
+
+  To use this module, you need to have the `Exbox.Metrics.Connection` application running. Make sure to start it as an application in your supervision tree:
+
+  ```elixir
+  def start(_type, _args) do
+    children = [
+      {Exbox.Metrics.Connection, []}
+    ]
+    Supervisor.start_link(children, strategy: :one_for_one)
+  end
+  ```
+
+  ## Writing Metrics
+    The main function provided by this module is write_metric/1. It accepts a metric data structure and writes it to InfluxDB.
+
+  ## Examples
+
+  ## Writing Custom metrics
+
+    ```elixir
+    iex> metric = %Exbox.Metrics.Series.Generic{
+    ...>   measurement: "my_measurement",
+    ...>   fields: %{
+    ...>     "my_field" => 1
+    ...>   },
+    ...>   tags: %{
+    ...>     "my_tag" => "my_value"
+    ...>   }
+    ...> }
+    iex> Exbox.Metrics.Client.write_metric(metric)
+    {:ok, %Exbox.Metrics.Series.Generic{
+      measurement: "my_measurement",
+      fields: %{
+        "my_field" => 1
+      },
+      tags: %{
+        "my_tag" => "my_value"
+      }
+    }}
+    ```
+
+    ### Error Handling
+    If there is an error while writing the metric, the function will log the error using the Logger module. without crashing the process
   """
+
   alias Exbox.Metrics.Connection
   require Logger
 
