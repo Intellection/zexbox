@@ -32,12 +32,12 @@ defmodule Exbox.Metrics do
 
   Examples:
 
-      iex> Exbox.Metrics.attach_controller_metrics("myapp_endpoint_stop")
+      iex> Exbox.Metrics.attach_controller_metrics
       :ok
   """
-  @spec attach_controller_metrics(binary()) :: :ok
-  def attach_controller_metrics(name) do
-    attach_telemetry(name, [:phoenix, :endpoint, :stop])
+  @spec attach_controller_metrics() :: :ok
+  def attach_controller_metrics do
+    attach_telemetry("phoenix_controller_metrics", [:phoenix, :endpoint, :stop])
   end
 
   @doc """
