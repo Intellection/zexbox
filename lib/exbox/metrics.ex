@@ -50,12 +50,14 @@ defmodule Exbox.Metrics do
   """
   @spec attach_telemetry(binary(), list(atom())) :: :ok
   def attach_telemetry(event, params) do
-    :ok =
-      :telemetry.attach(
-        event,
-        params,
-        &MetricHandler.handle_event/4,
-        nil
-      )
+    if Application.get_env(:exbox, :capture_telemetry_events) do
+      :ok =
+        :telemetry.attach(
+          event,
+          params,
+          &MetricHandler.handle_event/4,
+          nil
+        )
+    end
   end
 end
