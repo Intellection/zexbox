@@ -70,7 +70,6 @@ defmodule Exbox.Metrics.Client do
     |> write_to_influx()
   end
 
-  @spec write_metric(series()) :: tuple()
   def write_metric(metric), do: write_to_influx(metric)
 
   defp write_to_influx(metric) do
