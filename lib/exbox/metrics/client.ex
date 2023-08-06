@@ -64,7 +64,7 @@ defmodule Exbox.Metrics.Client do
       {:ok, %ControllerMetrics{}}
   """
   @spec write_metric(series()) :: tuple()
-  def write_metric(%Exbox.Metrics.Series.Generic{} = metrics) do
+  def write_metric(%Exbox.Metrics.Series{} = metrics) do
     metrics
     |> Map.from_struct()
     |> write_to_influx()

@@ -1,4 +1,4 @@
-defmodule Exbox.Metrics.Series.Generic do
+defmodule Exbox.Metrics.Series do
   @moduledoc """
   This module defines a simple struct to write metrics to InfluxDB.
   the attributes are:
