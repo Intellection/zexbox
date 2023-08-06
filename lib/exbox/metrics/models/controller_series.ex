@@ -1,4 +1,4 @@
-defmodule Exbox.Metrics.Models.ControllerMetrics do
+defmodule Exbox.Metrics.ControllerMetrics do
   @moduledoc """
   This module defines generic controller metrics.
 
