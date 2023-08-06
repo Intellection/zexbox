@@ -53,15 +53,15 @@ defmodule Exbox.Metrics.Client do
   alias Exbox.Metrics.Connection
   require Logger
 
-  @type series :: %Exbox.Metrics.Series.ControllerMetrics{}
+  @type series :: %Exbox.Metrics.ControllerSeries{}
 
   @doc """
   Write a metric to InfluxDB.
 
   Examples:
 
-      iex> Exbox.Metrics.Client.write_metric(%ControllerMetrics{})
-      {:ok, %ControllerMetrics{}}
+      iex> Exbox.Metrics.Client.write_metric(%ControllerSeries{})
+      {:ok, %ControllerSeries{}}
   """
   @spec write_metric(series()) :: tuple()
   def write_metric(%Exbox.Metrics.Series{} = metrics) do
