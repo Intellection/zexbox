@@ -9,7 +9,7 @@ defmodule Exbox.Supervisor do
   """
   def start_link(args) do
     start_state = Supervisor.start_link(__MODULE__, nil, name: :exbox)
-    default_opt_in_configurations
+    default_opt_in_configurations()
     start_state
   end
 
@@ -23,7 +23,7 @@ defmodule Exbox.Supervisor do
     Supervisor.init(children, strategy: :one_for_one)
   end
 
-  defp default_opt_in_configurations do
+  def default_opt_in_configurations do
     Exbox.Metrics.attach_controller_metrics()
   end
 end
