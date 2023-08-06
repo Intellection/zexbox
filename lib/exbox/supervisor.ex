@@ -7,7 +7,7 @@ defmodule Exbox.Supervisor do
     All GenServers, Supervisors and other processes for Exbox should be started from here.
     It also has an entry point point for default opt-in by default functionality like attach_controller_metrics
   """
-  def start_link(args) do
+  def start_link(_args) do
     start_state = Supervisor.start_link(__MODULE__, nil, name: :exbox)
     default_opt_in_configurations()
     start_state
