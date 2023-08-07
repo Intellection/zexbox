@@ -13,7 +13,6 @@ defmodule Exbox do
   @doc """
   Start the supervisor for Exbox.
   """
-  @spec start_link(term()) :: Supervisor.on_start()
   def start_link(_args) do
     start_state = Supervisor.start_link(__MODULE__, nil, name: :exbox)
     default_opt_in_configurations()
@@ -23,7 +22,6 @@ defmodule Exbox do
   @doc """
   Initialise the supervisor for Exbox. Set the children for the supervisor here.
   """
-  @spec init(term()) :: Supervisor.Init.t()
   def init(_args) do
     children = [
       Exbox.Metrics.Connection
