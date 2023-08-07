@@ -16,7 +16,7 @@ defmodule Exbox.Logging do
     )
   end
 
-  @spec attach_telemetry(binary(), list(atom()), (any() -> any())) :: :ok
+  @spec attach_telemetry(binary(), list(atom()), (any(), any(), any(), any() -> any() -> any())) :: :ok
   def attach_telemetry(event, params, function) do
     if Exbox.Config.capture_telemetry_log_events?() do
       :ok =
