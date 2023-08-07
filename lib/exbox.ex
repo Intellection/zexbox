@@ -10,12 +10,20 @@ defmodule Exbox do
   """
   use Supervisor
 
+  @doc """
+  Start the supervisor for Exbox.
+  """
+  # credo:disable-for-next-line
   def start_link(_args) do
     start_state = Supervisor.start_link(__MODULE__, nil, name: :exbox)
     default_opt_in_configurations()
     start_state
   end
 
+  @doc """
+  Initialise the supervisor for Exbox. Set the children for the supervisor here.
+  """
+  # credo:disable-for-next-line
   def init(_args) do
     children = [
       Exbox.Metrics.Connection
@@ -25,7 +33,7 @@ defmodule Exbox do
     Supervisor.init(children, strategy: :one_for_one)
   end
 
-  def default_opt_in_configurations do
+  defp default_opt_in_configurations do
     Exbox.Metrics.attach_controller_metrics()
     Exbox.Logging.attach_controller_logs()
   end

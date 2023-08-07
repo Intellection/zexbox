@@ -5,26 +5,6 @@ defmodule Exbox.Metrics do
   To use this module, you must have the Telemetry library installed.
   To do so, add {:telemetry, "~> 1.2.1"} to your list of dependencies in mix.exs.
 
-  To start the connection, you need to add `Exbox.Metrics.Connection` as an application in your supervision tree:
-
-  ## Examples
-
-      def start(_type, _args) do
-        children = [
-          {Exbox.Metrics.Connection, []}
-        ]
-        Supervisor.start_link(children, strategy: :one_for_one)
-      end
-
-  To attach generic controller metrics, call `Exbox.Metrics.attach_controller_metrics/0` when starting your application
-  with a relevant name:
-
-  ## Examples
-
-      def start(_type, _args) do
-        Exbox.Metrics.attach_controller_metrics()
-      end
-
   If you want to attach metrics to other events, you can use `Exbox.Metrics.attach_telemetry/3`:
 
   ## Examples

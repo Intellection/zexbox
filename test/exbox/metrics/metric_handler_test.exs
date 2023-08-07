@@ -1,8 +1,8 @@
 defmodule Exbox.Metrics.MetricHandlerTest do
   use ExUnit.Case
 
-  alias Exbox.Metrics.MetricHandler
   alias Exbox.Metrics.ControllerSeries
+  alias Exbox.Metrics.MetricHandler
 
   defmodule MockClient do
     @spec write_metric(ControllerSeries.t()) :: ControllerSeries.t()
