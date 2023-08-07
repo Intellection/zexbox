@@ -1,4 +1,4 @@
-defmodule Exbox.Metrics.Series do
+defmodule Exbox.Metrics.SeriesTest do
   use ExUnit.Case
 
   alias Exbox.Metrics.Series

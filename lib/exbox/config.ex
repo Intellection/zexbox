@@ -17,10 +17,22 @@ defmodule Exbox.Config do
     capture_telemetry_log_events: false
   }
 
-  def capture_telemetry_metric_events?(), do: config_value(:capture_telemetry_metric_events)
+  @doc """
+  Returns the configuration for capture_telemetry_metric_events
+  """
+  @spec capture_telemetry_metric_events? :: boolean()
+  def capture_telemetry_metric_events?, do: config_value(:capture_telemetry_metric_events)
 
-  def capture_telemetry_log_events?(), do: config_value(:capture_telemetry_log_events)
+  @doc """
+  Returns the configuration for capture_telemetry_log_events
+  """
+  @spec capture_telemetry_log_events? :: boolean()
+  def capture_telemetry_log_events?, do: config_value(:capture_telemetry_log_events)
 
+  @doc """
+  Returns the configuration value for the given key.
+  """
+  @spec config_value(atom()) :: any()
   def config_value(key) do
     case Application.get_env(:exbox, :features)[key] do
       nil -> Map.get(@default_config, key)

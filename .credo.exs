@@ -22,7 +22,7 @@
         # In the latter case `**/*.{ex,exs}` will be used.
         #
         included: ["lib/", "test/"],
-        excluded: [~r"/_build/", ~r"/deps/", ~r"/node_modules/", "lib/narrator_core.ex", "lib/narrator/core/telemetry.ex"]
+        excluded: [~r"/_build/", ~r"/deps/", ~r"/node_modules/"]
       },
       #
       # Load and configure plugins here:
