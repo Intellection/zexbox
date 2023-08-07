@@ -2,10 +2,10 @@ defmodule Exbox.Metrics.MetricHandlerTest do
   use ExUnit.Case
 
   alias Exbox.Metrics.MetricHandler
-  alias Exbox.Metrics.Series.ControllerMetrics
+  alias Exbox.Metrics.ControllerSeries
 
   defmodule MockClient do
-    @spec write_metric(ControllerMetrics.t()) :: ControllerMetrics.t()
+    @spec write_metric(ControllerSeries.t()) :: ControllerSeries.t()
     def write_metric(metric) do
       metric
     end
@@ -30,8 +30,8 @@ defmodule Exbox.Metrics.MetricHandlerTest do
 
     config = %{metric_client: MockClient}
 
-    expected = %ControllerMetrics{
-      fields: %Exbox.Metrics.Series.ControllerMetrics.Fields{
+    expected = %ControllerSeries{
+      fields: %Exbox.Metrics.ControllerSeries.Fields{
         count: 1,
         trace_id: "empty_for_now",
         duration_ms: 1000,
@@ -40,7 +40,7 @@ defmodule Exbox.Metrics.MetricHandlerTest do
         request_id: nil,
         success: 1.0
       },
-      tags: %Exbox.Metrics.Series.ControllerMetrics.Tags{
+      tags: %Exbox.Metrics.ControllerSeries.Tags{
         action: "index",
         controller: "page_controller",
         format: "html",
