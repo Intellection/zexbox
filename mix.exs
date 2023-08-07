@@ -7,6 +7,7 @@ defmodule Exbox.MixProject do
       version: "0.3.1",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
+      dialyzer: [plt_add_apps: [:mix, :ex_unit]],
       description: description(),
       package: package(),
       deps: deps(),
@@ -31,7 +32,8 @@ defmodule Exbox.MixProject do
       {:eredis, "~>1.4.0", manager: :rebar3, override: true},
       {:instream, "~> 2.2"},
       {:telemetry, "~> 1.2.1"},
-      {:ex_doc, "~> 0.16", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.16", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.3", only: [:dev, :test], runtime: false}
     ]
   end
 
