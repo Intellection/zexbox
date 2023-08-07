@@ -90,7 +90,7 @@ defmodule Exbox.Metrics do
   """
   @spec attach_telemetry(binary(), [atom() | :stop], (any(), any(), any(), any() -> any())) :: :ok
   def attach_telemetry(event, params, function) do
-    if Exbox.Config.capture_telemetry_events?() do
+    if Exbox.Config.capture_telemetry_metric_events?() do
       :ok =
         :telemetry.attach(
           event,

@@ -10,9 +10,6 @@ defmodule Exbox do
   """
   use Supervisor
 
-  @moduledoc """
-
-  """
   def start_link(_args) do
     start_state = Supervisor.start_link(__MODULE__, nil, name: :exbox)
     default_opt_in_configurations()
@@ -30,5 +27,6 @@ defmodule Exbox do
 
   def default_opt_in_configurations do
     Exbox.Metrics.attach_controller_metrics()
+    Exbox.Logging.attach_controller_logs()
   end
 end
