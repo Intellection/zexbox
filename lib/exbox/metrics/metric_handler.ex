@@ -17,8 +17,7 @@ defmodule Exbox.Metrics.MetricHandler do
   """
   @spec handle_event(list(atom), map, map, map) :: any()
   def handle_event([:phoenix, :endpoint, :stop], measurements, metadata, config) do
-    try do
-      status = metadata.conn.status
+    status = metadata.conn.status
 
       point =
         %ControllerSeries{}
@@ -40,12 +39,11 @@ defmodule Exbox.Metrics.MetricHandler do
         |> ControllerSeries.field(:http_referer, referer(metadata.conn))
         |> ControllerSeries.field(:duration_ms, duration(measurements))
 
-      point
-      |> write_metric(config)
-    rescue
-      exception ->
-        Logger.debug("Exception creating controller series: #{inspect(exception)}")
-    end
+    point
+    |> write_metric(config)
+  rescue
+    exception ->
+      Logger.debug("Exception creating controller series: #{inspect(exception)}")
   end
 
   defp write_metric(metric, %{metric_client: client}) do

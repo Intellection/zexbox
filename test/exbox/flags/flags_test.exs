@@ -5,12 +5,12 @@ defmodule Exbox.FlagsTest do
   require Logger
 
   defp start_client(tag) do
-    :ldclient.start_instance('sdk-key', tag, %{
+    :ldclient.start_instance(~c"sdk-key", tag, %{
       file_datasource: true,
       send_events: false,
       file_auto_update: true,
       feature_store: :ldclient_storage_map,
-      file_paths: ['test/features/flags.json']
+      file_paths: [~c"test/features/flags.json"]
     })
   end
 

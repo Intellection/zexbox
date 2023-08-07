@@ -2,21 +2,23 @@ defmodule Mix.Tasks.Bump do
   @moduledoc """
   Bump version number in mix.exs and create a new git tag.
   """
-
+  @doc """
+  Runs the task with the given arguments.
+  """
   @spec run([binary]) :: :ok
   def run(args) do
     check_master_branch()
-    {parsed, _, _} = OptionParser.parse(args, strict: [level: :string])
+    {parsed, _args, _invalid} = OptionParser.parse(args, strict: [level: :string])
     level = parsed[:level]
     version = Mix.Project.config()[:version]
 
     with {:ok, new_version} <- bump(version, level),
-         {:ok, _} <- confirm_changes(new_version),
-         {:ok, _} <- update_version(new_version),
-         {:ok, _} <- commit_changes(new_version),
-         {:ok, _} <- push_changes(),
-         {:ok, _} <- create_tag(new_version),
-         {:ok, _} <- push_tag(new_version) do
+         {:ok, _message} <- confirm_changes(new_version),
+         {:ok, _message} <- update_version(new_version),
+         {:ok, _message} <- commit_changes(new_version),
+         {:ok, _message} <- push_changes(),
+         {:ok, _message} <- create_tag(new_version),
+         {:ok, _message} <- push_tag(new_version) do
       IO.puts("Bumped version from #{version} to #{new_version}")
       :ok
     else
@@ -30,11 +32,11 @@ defmodule Mix.Tasks.Bump do
 
     case IO.gets("") do
       "y\n" -> {:ok, new_version}
-      _ -> {:error, "Aborted"}
+      _error -> {:error, "Aborted"}
     end
   end
 
-  defp check_master_branch() do
+  defp check_master_branch do
     IO.puts("Checking current branch")
     current_branch = System.cmd("git", ["branch", "--show-current"])
 
@@ -56,7 +58,7 @@ defmodule Mix.Tasks.Bump do
     {:ok, new_version}
   end
 
-  defp push_changes() do
+  defp push_changes do
     IO.puts("Pushing changes")
     system("git push origin master")
     {:ok, "Pushed changes"}
@@ -95,7 +97,7 @@ defmodule Mix.Tasks.Bump do
       "major" -> {:ok, bump_major(version)}
       "minor" -> {:ok, bump_minor(version)}
       "patch" -> {:ok, bump_patch(version)}
-      _ -> {:error, "Invalid bump level"}
+      _error -> {:error, "Invalid bump level"}
     end
   end
 

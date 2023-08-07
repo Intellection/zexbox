@@ -85,10 +85,10 @@ defmodule Exbox.Metrics do
   ## Parameters
     - `event` (binary()) - The name of the event to which metrics will be attached.
     - `params` (list(atom())) - A list of parameters representing the context of the event.
-    - `function` (any() -> any()) - The function to be called when the event occurs.
+    - `function` (any(), any(), any(), any() -> any()) - The function to be called when the event occurs.
   Returns :ok if the metrics are successfully attached.
   """
-  @spec attach_telemetry(binary(), list(atom()), (any() -> any())) :: :ok
+  @spec attach_telemetry(binary(), [atom() | :stop], (any(), any(), any(), any() -> any())) :: :ok
   def attach_telemetry(event, params, function) do
     if Exbox.Config.capture_telemetry_metric_events?() do
       :ok =

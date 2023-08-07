@@ -19,3 +19,10 @@ Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_do
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at <https://hexdocs.pm/exbox>.
 
+## Docker Compose
+- Run
+```
+docker compose up
+```
+- For grafana browse to `http://localhost:3000/`
+- use `http://influxdb:8086` as a data source
