@@ -12,7 +12,33 @@ defmodule Exbox.MixProject do
       package: package(),
       deps: deps(),
       name: "Exbox",
-      source_url: "https://github.com/Intellection/exbox"
+      source_url: "https://github.com/Intellection/exbox",
+      test_coverage: [
+        ignore_modules: [
+          Exbox.Metrics.MetricHandler,
+          Exbox.Metrics.Connection,
+          Exbox.Metrics,
+          Exbox.Endpoint,
+          Exbox.Router,
+          ExboxWeb.Router.Helpers,
+          ExboxWeb.Router,
+          ExboxWeb.Endpoint,
+          ExboxWeb.ErrorView,
+          ExboxWeb.PageView,
+          ExboxWeb.LayoutView,
+          ExboxWeb.UserView,
+          ExboxWeb.UserController,
+          ExboxWeb.PageController,
+          ExboxWeb.ErrorController,
+          ExboxWeb.LayoutController,
+          ExboxWeb.FallbackController,
+          ExboxWeb,
+          Exbox.Application,
+          Mix.Tasks.Bump,
+          Exbox.Metrics.Client,
+          Exbox.Flags
+        ]
+      ]
     ]
   end
 
@@ -34,7 +60,9 @@ defmodule Exbox.MixProject do
       {:telemetry, "~> 1.2.1"},
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
       {:dialyxir, "~> 1.3", only: [:dev, :test], runtime: false},
-      {:mix_audit, "~> 2.0", only: [:dev, :test], runtime: false}
+      {:mix_audit, "~> 2.0", only: [:dev, :test], runtime: false},
+      {:doctor, "~> 0.21.0", only: [:dev, :test]},
+      {:sobelow, "~> 0.8", only: [:dev, :test]}
     ]
   end
 

@@ -37,6 +37,9 @@ defmodule Exbox.Flags do
     |> start(:default)
   end
 
+  @doc """
+  Starts the LaunchDarkly client with the given config and tag.
+  """
   @spec start(map(), atom()) :: :ok | {:error, atom(), term()}
   def start(%{sdk_key: sdk_key} = config, tag) do
     sdk_key
@@ -53,6 +56,9 @@ defmodule Exbox.Flags do
       e.term
   end
 
+  @doc """
+  Starts the LaunchDarkly client with the given config.
+  """
   @spec start(map()) :: :ok | {:error, atom(), any()}
   def start(config), do: start(config, :default)
 
@@ -72,14 +78,23 @@ defmodule Exbox.Flags do
     :ldclient.variation(key, :ldclient_context.new_from_map(context), default, tag)
   end
 
+  @doc """
+  Gets the variation of a flag for the given key, context, and default value.
+  """
   @spec variation(String.t(), map(), any()) :: any()
   def variation(key, context_key, default), do: variation(key, context_key, default, :default)
 
+  @doc """
+    Stops the ldclient with the given tag.
+  """
   @spec stop(atom()) :: :ok
   def stop(tag) do
     :ldclient.stop_instance(tag)
   end
 
+  @doc """
+    Stops the ldclient with the default tag.
+  """
   @spec stop() :: :ok
   def stop, do: stop(:default)
 
