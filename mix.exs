@@ -46,4 +46,28 @@ defmodule Exbox.MixProject do
       organization: "zappi"
     ]
   end
+
+  defp aliases do
+    [
+      "test.lint": [
+        "hex.audit",
+        "hex.outdated --within-requirements",
+        "deps.unlock --check-unused",
+        "format --check-formatted --dry-run",
+        "credo --all",
+        "dialyzer",
+        "doctor"
+      ],
+      "test.security": [
+        "deps.audit",
+        "sobelow --config"
+      ],
+      "test.all": [
+        "test",
+        "test --cover",
+        "test.lint",
+        "test.security"
+      ]
+    ]
+  end
 end
