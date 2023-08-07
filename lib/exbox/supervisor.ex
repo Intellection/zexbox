@@ -25,5 +25,6 @@ defmodule Exbox.Supervisor do
 
   def default_opt_in_configurations do
     Exbox.Metrics.attach_controller_metrics()
+    Exbox.Logging.attach_controller_logs()
   end
 end
