@@ -19,25 +19,25 @@ defmodule Exbox.Metrics.MetricHandler do
   def handle_event([:phoenix, :endpoint, :stop], measurements, metadata, config) do
     status = metadata.conn.status
 
-      point =
-        %ControllerSeries{}
-        |> ControllerSeries.tag(:method, metadata.conn.method)
-        |> ControllerSeries.tag(
-          :action,
-          Atom.to_string(Map.get(metadata.conn.private, :phoenix_action, nil))
-        )
-        |> ControllerSeries.tag(:format, metadata.conn.private.phoenix_format)
-        |> ControllerSeries.tag(:status, status)
-        |> ControllerSeries.tag(
-          :controller,
-          Atom.to_string(metadata.conn.private.phoenix_controller)
-        )
-        |> ControllerSeries.field(:count, 1)
-        |> ControllerSeries.field(:trace_id, "empty_for_now")
-        |> ControllerSeries.field(:success, success?(status))
-        |> ControllerSeries.field(:path, metadata.conn.request_path)
-        |> ControllerSeries.field(:http_referer, referer(metadata.conn))
-        |> ControllerSeries.field(:duration_ms, duration(measurements))
+    point =
+      %ControllerSeries{}
+      |> ControllerSeries.tag(:method, metadata.conn.method)
+      |> ControllerSeries.tag(
+        :action,
+        Atom.to_string(Map.get(metadata.conn.private, :phoenix_action, nil))
+      )
+      |> ControllerSeries.tag(:format, metadata.conn.private.phoenix_format)
+      |> ControllerSeries.tag(:status, status)
+      |> ControllerSeries.tag(
+        :controller,
+        Atom.to_string(metadata.conn.private.phoenix_controller)
+      )
+      |> ControllerSeries.field(:count, 1)
+      |> ControllerSeries.field(:trace_id, "empty_for_now")
+      |> ControllerSeries.field(:success, success?(status))
+      |> ControllerSeries.field(:path, metadata.conn.request_path)
+      |> ControllerSeries.field(:http_referer, referer(metadata.conn))
+      |> ControllerSeries.field(:duration_ms, duration(measurements))
 
     point
     |> write_metric(config)
