@@ -65,16 +65,16 @@ defmodule Exbox.Metrics.Client do
   """
   @spec write_metric(series()) :: tuple()
   def write_metric(%Exbox.Metrics.Series.Generic{} = metrics) do
-    metric
+    metrics
     |> Map.from_struct()
     |> write_to_influx()
   end
 
-  def write_metric(metric), do: write_to_influx(metric)
+  def write_metric(metrics), do: write_to_influx(metrics)
 
-  defp write_to_influx(metric) do
+  defp write_to_influx(metrics) do
     try do
-      metric
+      metrics
       |> Connection.write()
     rescue
       error ->
