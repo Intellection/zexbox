@@ -54,9 +54,6 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
-          name: Setup database
-          command: mix ecto.setup
-      - run:
           name: Run tests
           command: mix test --cover --export-coverage default
       - run:

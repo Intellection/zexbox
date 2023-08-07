@@ -33,7 +33,8 @@ defmodule Exbox.MixProject do
       {:instream, "~> 2.2"},
       {:telemetry, "~> 1.2.1"},
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
-      {:dialyxir, "~> 1.3", only: [:dev, :test], runtime: false}
+      {:dialyxir, "~> 1.3", only: [:dev, :test], runtime: false},
+      {:mix_audit, "~> 2.0", only: [:dev, :test], runtime: false}
     ]
   end
 
@@ -46,30 +47,6 @@ defmodule Exbox.MixProject do
       files: ~w(lib .formatter.exs mix.exs README*),
       licenses: ["Apache-2.0"],
       organization: "zappi"
-    ]
-  end
-
-  defp aliases do
-    [
-      "test.lint": [
-        "hex.audit",
-        "hex.outdated --within-requirements",
-        "deps.unlock --check-unused",
-        "format --check-formatted --dry-run",
-        "credo --all",
-        "dialyzer",
-        "doctor"
-      ],
-      "test.security": [
-        "deps.audit",
-        "sobelow --config"
-      ],
-      "test.all": [
-        "test",
-        "test --cover",
-        "test.lint",
-        "test.security"
-      ]
     ]
   end
 end
