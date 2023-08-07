@@ -43,6 +43,7 @@ defmodule Exbox.MixProject do
       {:eredis, "~>1.4.0", manager: :rebar3, override: true},
       {:instream, "~> 2.2"},
       {:telemetry, "~> 1.2.1"},
+      {:jason, "~> 1.4.1"},
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
       {:dialyxir, "~> 1.3", only: [:dev, :test], runtime: false},
       {:mix_audit, "~> 2.0", only: [:dev, :test], runtime: false},
