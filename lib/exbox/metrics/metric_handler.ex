@@ -3,7 +3,7 @@ defmodule Exbox.Metrics.MetricHandler do
   This module is responsible for logging controller metrics to influx
   """
   alias Exbox.Metrics.Client
-  alias Exbox.Metrics.Series.ControllerMetrics
+  alias Exbox.Metrics.ControllerSeries
   require Logger
 
   @doc """
@@ -21,24 +21,24 @@ defmodule Exbox.Metrics.MetricHandler do
       status = metadata.conn.status
 
       point =
-        %ControllerMetrics{}
-        |> ControllerMetrics.tag(:method, metadata.conn.method)
-        |> ControllerMetrics.tag(
+        %ControllerSeries{}
+        |> ControllerSeries.tag(:method, metadata.conn.method)
+        |> ControllerSeries.tag(
           :action,
           Atom.to_string(Map.get(metadata.conn.private, :phoenix_action, nil))
         )
-        |> ControllerMetrics.tag(:format, metadata.conn.private.phoenix_format)
-        |> ControllerMetrics.tag(:status, status)
-        |> ControllerMetrics.tag(
+        |> ControllerSeries.tag(:format, metadata.conn.private.phoenix_format)
+        |> ControllerSeries.tag(:status, status)
+        |> ControllerSeries.tag(
           :controller,
           Atom.to_string(metadata.conn.private.phoenix_controller)
         )
-        |> ControllerMetrics.field(:count, 1)
-        |> ControllerMetrics.field(:trace_id, "empty_for_now")
-        |> ControllerMetrics.field(:success, success?(status))
-        |> ControllerMetrics.field(:path, metadata.conn.request_path)
-        |> ControllerMetrics.field(:http_referer, referer(metadata.conn))
-        |> ControllerMetrics.field(:duration_ms, duration(measurements))
+        |> ControllerSeries.field(:count, 1)
+        |> ControllerSeries.field(:trace_id, "empty_for_now")
+        |> ControllerSeries.field(:success, success?(status))
+        |> ControllerSeries.field(:path, metadata.conn.request_path)
+        |> ControllerSeries.field(:http_referer, referer(metadata.conn))
+        |> ControllerSeries.field(:duration_ms, duration(measurements))
 
       point
       |> write_metric(config)

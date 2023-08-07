@@ -1,10 +1,10 @@
-defmodule Exbox.Metrics.Series.GenericTest do
+defmodule Exbox.Metrics.Series do
   use ExUnit.Case
 
-  alias Exbox.Metrics.Series.Generic
+  alias Exbox.Metrics.Series
 
   test "creates a default struct with correct defaults" do
-    metric = %Generic{
+    metric = %Series{
       measurement: "my_measurement",
       fields: %{},
       tags: %{},
@@ -23,7 +23,7 @@ defmodule Exbox.Metrics.Series.GenericTest do
     tags = %{tag1: "tag_value", tag2: 123}
     timestamp = DateTime.utc_now()
 
-    metric = %Generic{measurement: measurement, fields: fields, tags: tags, timestamp: timestamp}
+    metric = %Series{measurement: measurement, fields: fields, tags: tags, timestamp: timestamp}
 
     assert metric.measurement == measurement
     assert metric.fields == fields
