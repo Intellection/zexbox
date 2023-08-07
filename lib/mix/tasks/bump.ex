@@ -36,7 +36,7 @@ defmodule Mix.Tasks.Bump do
     end
   end
 
-  defp check_master_branch() do
+  defp check_master_branch do
     IO.puts("Checking current branch")
     current_branch = System.cmd("git", ["branch", "--show-current"])
 
@@ -58,7 +58,7 @@ defmodule Mix.Tasks.Bump do
     {:ok, new_version}
   end
 
-  defp push_changes() do
+  defp push_changes do
     IO.puts("Pushing changes")
     system("git push origin master")
     {:ok, "Pushed changes"}

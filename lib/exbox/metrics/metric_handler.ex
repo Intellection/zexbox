@@ -17,35 +17,33 @@ defmodule Exbox.Metrics.MetricHandler do
   """
   @spec handle_event(list(atom), map, map, map) :: any()
   def handle_event([:phoenix, :endpoint, :stop], measurements, metadata, config) do
-    try do
-      status = metadata.conn.status
+    status = metadata.conn.status
 
-      point =
-        %ControllerMetrics{}
-        |> ControllerMetrics.tag(:method, metadata.conn.method)
-        |> ControllerMetrics.tag(
-          :action,
-          Atom.to_string(Map.get(metadata.conn.private, :phoenix_action, nil))
-        )
-        |> ControllerMetrics.tag(:format, metadata.conn.private.phoenix_format)
-        |> ControllerMetrics.tag(:status, status)
-        |> ControllerMetrics.tag(
-          :controller,
-          Atom.to_string(metadata.conn.private.phoenix_controller)
-        )
-        |> ControllerMetrics.field(:count, 1)
-        |> ControllerMetrics.field(:trace_id, "empty_for_now")
-        |> ControllerMetrics.field(:success, success?(status))
-        |> ControllerMetrics.field(:path, metadata.conn.request_path)
-        |> ControllerMetrics.field(:http_referer, referer(metadata.conn))
-        |> ControllerMetrics.field(:duration_ms, duration(measurements))
+    point =
+      %ControllerMetrics{}
+      |> ControllerMetrics.tag(:method, metadata.conn.method)
+      |> ControllerMetrics.tag(
+        :action,
+        Atom.to_string(Map.get(metadata.conn.private, :phoenix_action, nil))
+      )
+      |> ControllerMetrics.tag(:format, metadata.conn.private.phoenix_format)
+      |> ControllerMetrics.tag(:status, status)
+      |> ControllerMetrics.tag(
+        :controller,
+        Atom.to_string(metadata.conn.private.phoenix_controller)
+      )
+      |> ControllerMetrics.field(:count, 1)
+      |> ControllerMetrics.field(:trace_id, "empty_for_now")
+      |> ControllerMetrics.field(:success, success?(status))
+      |> ControllerMetrics.field(:path, metadata.conn.request_path)
+      |> ControllerMetrics.field(:http_referer, referer(metadata.conn))
+      |> ControllerMetrics.field(:duration_ms, duration(measurements))
 
-      point
-      |> write_metric(config)
-    rescue
-      exception ->
-        Logger.debug("Exception creating controller series: #{inspect(exception)}")
-    end
+    point
+    |> write_metric(config)
+  rescue
+    exception ->
+      Logger.debug("Exception creating controller series: #{inspect(exception)}")
   end
 
   defp write_metric(metric, %{metric_client: client}) do

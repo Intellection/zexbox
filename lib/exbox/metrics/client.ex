@@ -73,12 +73,10 @@ defmodule Exbox.Metrics.Client do
   def write_metric(metrics), do: write_to_influx(metrics)
 
   defp write_to_influx(metrics) do
-    try do
-      metrics
-      |> Connection.write()
-    rescue
-      error ->
-        Logger.debug("Failed to write metric to InfluxDB: #{inspect(error)}")
-    end
+    metrics
+    |> Connection.write()
+  rescue
+    error ->
+      Logger.debug("Failed to write metric to InfluxDB: #{inspect(error)}")
   end
 end
