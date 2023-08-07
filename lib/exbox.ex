@@ -10,9 +10,6 @@ defmodule Exbox do
   """
   use Supervisor
 
-  @moduledoc """
-
-  """
   def start_link(_args) do
     start_state = Supervisor.start_link(__MODULE__, nil, name: :exbox)
     default_opt_in_configurations()
