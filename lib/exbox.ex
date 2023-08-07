@@ -13,6 +13,7 @@ defmodule Exbox do
   @doc """
   Start the supervisor for Exbox.
   """
+  # credo:disable-for-next-line
   def start_link(_args) do
     start_state = Supervisor.start_link(__MODULE__, nil, name: :exbox)
     default_opt_in_configurations()
@@ -22,6 +23,7 @@ defmodule Exbox do
   @doc """
   Initialise the supervisor for Exbox. Set the children for the supervisor here.
   """
+  # credo:disable-for-next-line
   def init(_args) do
     children = [
       Exbox.Metrics.Connection
