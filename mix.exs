@@ -57,6 +57,7 @@ defmodule Exbox.MixProject do
 
   defp package() do
     [
+      name: "zexbox",
       files: ~w(lib .formatter.exs mix.exs README* LICENSE*),
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/Intellection/exbox"}
