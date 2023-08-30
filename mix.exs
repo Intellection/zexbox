@@ -4,7 +4,7 @@ defmodule Exbox.MixProject do
   def project do
     [
       app: :exbox,
-      version: "0.3.3",
+      version: "0.3.6",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       dialyzer: [plt_add_apps: [:mix, :ex_unit]],
@@ -57,8 +57,10 @@ defmodule Exbox.MixProject do
 
   defp package() do
     [
-      files: ~w(lib .formatter.exs mix.exs README*),
-      licenses: ["MIT"]
+      name: "zexbox",
+      files: ~w(lib .formatter.exs mix.exs README* LICENSE*),
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/Intellection/exbox"}
     ]
   end
 end
