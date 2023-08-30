@@ -58,8 +58,7 @@ defmodule Exbox.MixProject do
   defp package() do
     [
       files: ~w(lib .formatter.exs mix.exs README*),
-      licenses: ["Apache-2.0"],
-      organization: "zappi"
+      licenses: ["MIT"]
     ]
   end
 end
