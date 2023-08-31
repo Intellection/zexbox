@@ -35,4 +35,4 @@ docker compose up
 
 Copyright (c) 2023, Zappistore.
 
-Phoenix source code is licensed under the [MIT License](LICENSE.md).
+Zexbox source code is licensed under the [MIT License](LICENSE.md).
