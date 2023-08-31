@@ -3,7 +3,7 @@ defmodule Zexbox.MixProject do
 
   def project do
     [
-      app: :exbox,
+      app: :zexbox,
       version: "0.3.7",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,

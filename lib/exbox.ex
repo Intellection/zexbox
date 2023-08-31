@@ -15,7 +15,7 @@ defmodule Zexbox do
   """
   # credo:disable-for-next-line
   def start_link(_args) do
-    start_state = Supervisor.start_link(__MODULE__, nil, name: :exbox)
+    start_state = Supervisor.start_link(__MODULE__, nil, name: :zexbox)
     default_opt_in_configurations()
     start_state
   end

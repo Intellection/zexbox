@@ -5,7 +5,7 @@ defmodule Zexbox.LoggingTest do
 
   describe "attach_controller_logs/0" do
     test "attaches logging for controller stop and start events" do
-      Application.put_env(:exbox, Zexbox.Metrics.Connection, [])
+      Application.put_env(:zexbox, Zexbox.Metrics.Connection, [])
       {:ok, _pid} = Supervisor.start_link(Zexbox, nil)
       attach_controller_logs()
 
@@ -15,7 +15,7 @@ defmodule Zexbox.LoggingTest do
 
   describe "attach_telemetry/3" do
     setup do
-      Application.put_env(:exbox, :features, capture_telemetry_log_events: true)
+      Application.put_env(:zexbox, :features, capture_telemetry_log_events: true)
       :ok
     end
 
@@ -30,7 +30,7 @@ defmodule Zexbox.LoggingTest do
     end
 
     test "does not attach telemetry logs when capture_telemetry_log_events? is false" do
-      Application.put_env(:exbox, :features, capture_telemetry_log_events: false)
+      Application.put_env(:zexbox, :features, capture_telemetry_log_events: false)
       assert attach_telemetry("my_event", [:my, :event], fn _event -> :ok end) == nil
     end
   end

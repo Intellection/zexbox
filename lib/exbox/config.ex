@@ -4,7 +4,7 @@ defmodule Zexbox.Config do
   All configurations have a default value, which can be overridden in the application config.
   The application config is keyed in the following way:
   ```elixir
-  config :exbox, :features, [
+  config :zexbox, :features, [
     capture_telemetry_metric_events: true,
     capture_telemetry_log_events: false
   ]
@@ -34,7 +34,7 @@ defmodule Zexbox.Config do
   """
   @spec config_value(atom()) :: any()
   def config_value(key) do
-    case Application.get_env(:exbox, :features)[key] do
+    case Application.get_env(:zexbox, :features)[key] do
       nil -> Map.get(@default_config, key)
       value -> value
     end

@@ -32,7 +32,7 @@ defmodule Zexbox.Flags do
   """
   @spec start() :: :ok | {:error, atom(), term()}
   def start do
-    Application.fetch_env!(:exbox, :flags)
+    Application.fetch_env!(:zexbox, :flags)
     |> Enum.into(%{})
     |> start(:default)
   end
