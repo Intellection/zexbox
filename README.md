@@ -21,15 +21,18 @@ and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at <https://hexdocs.pm/exbox>.
 
 ## Docker Compose
+
 - Run
+
 ```
 docker compose up
 ```
+
 - For grafana browse to `http://localhost:3000/`
 - use `http://influxdb:8086` as a data source
 
 ## Copyright and License
 
-Copyright (c) 2023, Chris McCord.
+Copyright (c) 2023, Zappistore.
 
 Phoenix source code is licensed under the [MIT License](LICENSE.md).
