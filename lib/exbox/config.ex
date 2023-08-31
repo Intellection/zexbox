@@ -1,6 +1,6 @@
-defmodule Exbox.Config do
+defmodule Zexbox.Config do
   @moduledoc """
-  Exbox configuration module.
+  Zexbox configuration module.
   All configurations have a default value, which can be overridden in the application config.
   The application config is keyed in the following way:
   ```elixir

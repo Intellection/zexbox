@@ -1,7 +1,7 @@
-defmodule Exbox.Logging.LogHandlerTest do
+defmodule Zexbox.Logging.LogHandlerTest do
   use ExUnit.Case
 
-  import Exbox.Logging.LogHandler
+  import Zexbox.Logging.LogHandler
 
   describe "handle_event/4" do
     test "returns :ok for stop event" do

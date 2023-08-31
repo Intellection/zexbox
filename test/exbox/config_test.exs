@@ -1,7 +1,7 @@
-defmodule Exbox.ConfigTest do
+defmodule Zexbox.ConfigTest do
   use ExUnit.Case
 
-  import Exbox.Config
+  import Zexbox.Config
 
   describe "capture_telemetry_metric_events?" do
     test "returns default value when not overridden in config" do

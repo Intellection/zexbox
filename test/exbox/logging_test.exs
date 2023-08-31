@@ -1,12 +1,12 @@
-defmodule Exbox.LoggingTest do
+defmodule Zexbox.LoggingTest do
   use ExUnit.Case
 
-  import Exbox.Logging
+  import Zexbox.Logging
 
   describe "attach_controller_logs/0" do
     test "attaches logging for controller stop and start events" do
-      Application.put_env(:exbox, Exbox.Metrics.Connection, [])
-      {:ok, _pid} = Supervisor.start_link(Exbox, nil)
+      Application.put_env(:exbox, Zexbox.Metrics.Connection, [])
+      {:ok, _pid} = Supervisor.start_link(Zexbox, nil)
       attach_controller_logs()
 
       # Add assertions here to verify the attachment of controller logs for stop and start events

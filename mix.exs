@@ -1,4 +1,4 @@
-defmodule Exbox.MixProject do
+defmodule Zexbox.MixProject do
   use Mix.Project
 
   def project do
@@ -11,17 +11,17 @@ defmodule Exbox.MixProject do
       description: description(),
       package: package(),
       deps: deps(),
-      name: "Exbox",
+      name: "Zexbox",
       source_url: "https://github.com/Intellection/exbox",
       test_coverage: [
         ignore_modules: [
-          Exbox.Metrics,
-          Exbox.Metrics.MetricHandler,
-          Exbox.Metrics.Connection,
-          Exbox.Application,
+          Zexbox.Metrics,
+          Zexbox.Metrics.MetricHandler,
+          Zexbox.Metrics.Connection,
+          Zexbox.Application,
           Mix.Tasks.Bump,
-          Exbox.Metrics.Client,
-          Exbox.Flags
+          Zexbox.Metrics.Client,
+          Zexbox.Flags
         ]
       ]
     ]

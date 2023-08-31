@@ -1,7 +1,7 @@
-defmodule Exbox.Metrics.ControllerSeriesTest do
+defmodule Zexbox.Metrics.ControllerSeriesTest do
   use ExUnit.Case
 
-  alias Exbox.Metrics.ControllerSeries
+  alias Zexbox.Metrics.ControllerSeries
 
   describe "tag/3" do
     test "adds a tag to the series" do
