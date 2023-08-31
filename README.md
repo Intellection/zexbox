@@ -1,6 +1,7 @@
-# Exbox
+# Zexbox
 
-**TODO: Add description**
+[![Hex.pm](https://img.shields.io/hexpm/v/zexbox.svg)](https://hex.pm/packages/zexbox)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/Intellection/zexbox/tree/master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/Intellection/zexbox/tree/master)
 
 ## Installation
 
@@ -10,7 +11,7 @@ by adding `exbox` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:exbox, "~> 0.1.0"}
+    {:exbox, "~> 0.3.7"}
   ]
 end
 ```
@@ -26,3 +27,9 @@ docker compose up
 ```
 - For grafana browse to `http://localhost:3000/`
 - use `http://influxdb:8086` as a data source
+
+## Copyright and License
+
+Copyright (c) 2023, Chris McCord.
+
+Phoenix source code is licensed under the [MIT License](LICENSE.md).
