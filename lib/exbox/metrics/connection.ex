@@ -1,6 +1,6 @@
-defmodule Exbox.Metrics.Connection do
+defmodule Zexbox.Metrics.Connection do
   @moduledoc """
   Connection for writing metrics to InfluxDB.
   """
-  use Instream.Connection, otp_app: :exbox
+  use Instream.Connection, otp_app: :zexbox
 end

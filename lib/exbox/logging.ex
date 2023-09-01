@@ -1,11 +1,11 @@
-defmodule Exbox.Logging do
+defmodule Zexbox.Logging do
   @moduledoc """
   This module is responsible for attaching logging to telemetry events.
 
   To use this module, you must have the Telemetry library installed.
   To do so, add {:telemetry, "~> 1.2.1"} to your list of dependencies in mix.exs.
   """
-  alias Exbox.Logging.LogHandler
+  alias Zexbox.Logging.LogHandler
 
   @doc """
   Attaches logging to the Phoenix endpoint stop and start events.
@@ -42,7 +42,7 @@ defmodule Exbox.Logging do
   end
 
   def start(_type, _args) do
-    Exbox.Logging.attach_telemetry(:my_event, [:my, :event], &MyAppHandler.my_handler/3)
+    Zexbox.Logging.attach_telemetry(:my_event, [:my, :event], &MyAppHandler.my_handler/3)
   end
   ```
   In this example, when :my_event is triggered, the telemetry system will call MyAppHandler.my_handler/1 with the captured event data. Ensure that the handler function is implemented appropriately for your specific use case.
@@ -56,7 +56,7 @@ defmodule Exbox.Logging do
   """
   @spec attach_telemetry(binary(), list(atom()), (any(), any(), any(), any() -> any())) :: :ok
   def attach_telemetry(event, params, function) do
-    if Exbox.Config.capture_telemetry_log_events?() do
+    if Zexbox.Config.capture_telemetry_log_events?() do
       :ok =
         :telemetry.attach(
           event,

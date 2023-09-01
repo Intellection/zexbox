@@ -1,9 +1,9 @@
-defmodule Exbox.Metrics.MetricHandler do
+defmodule Zexbox.Metrics.MetricHandler do
   @moduledoc """
   This module is responsible for logging controller metrics to influx
   """
-  alias Exbox.Metrics.Client
-  alias Exbox.Metrics.ControllerSeries
+  alias Zexbox.Metrics.Client
+  alias Zexbox.Metrics.ControllerSeries
   require Logger
 
   @doc """
@@ -12,7 +12,7 @@ defmodule Exbox.Metrics.MetricHandler do
 
   Examples:
 
-      iex> Exbox.Metrics.MetricHandler.handle_event([:phoenix, :endpoint, :stop], measurements, metadata, config)
+      iex> Zexbox.Metrics.MetricHandler.handle_event([:phoenix, :endpoint, :stop], measurements, metadata, config)
       :ok
   """
   @spec handle_event(list(atom), map, map, map) :: any()

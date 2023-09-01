@@ -1,4 +1,4 @@
-defmodule Exbox.Flags do
+defmodule Zexbox.Flags do
   @moduledoc """
   An Elixir wrapper around the LaunchDarkly Erlang client
 
@@ -6,17 +6,17 @@ defmodule Exbox.Flags do
   To do so, add {:ldclient, "~> 2.0.0", hex: :launchdarkly_server_sdk} to your
   list of dependencies in mix.exs.
 
-  To start the client, call Exbox.Flags.start/2 when starting your application
+  To start the client, call Zexbox.Flags.start/2 when starting your application
   with a map of config options and an optional tag:
 
       iex> def start(_type, _args) do
-      iex>   Exbox.Flags.start(%{sdk_key: "sdk-key", private_attributes: [:email]})
+      iex>   Zexbox.Flags.start(%{sdk_key: "sdk-key", private_attributes: [:email]})
 
-  To make sure that the client shuts down, you should call Exbox.Flags.stop/1
+  To make sure that the client shuts down, you should call Zexbox.Flags.stop/1
   when your application shuts down:
 
       iex> def stop(_state) do
-      iex>   Exbox.Flags.stop()
+      iex>   Zexbox.Flags.stop()
   """
 
   @doc """
@@ -24,15 +24,15 @@ defmodule Exbox.Flags do
 
   Examples:
 
-        iex> Exbox.Flags.start(%{sdk_key: "sdk-key"}, :my_tag)
+        iex> Zexbox.Flags.start(%{sdk_key: "sdk-key"}, :my_tag)
         :ok
 
-        iex> Exbox.Flags.start(%{sdk_key: "sdk-key"}, :my_tag)
+        iex> Zexbox.Flags.start(%{sdk_key: "sdk-key"}, :my_tag)
         {:error, {:already_started, #PID<0.602.0>}}
   """
   @spec start() :: :ok | {:error, atom(), term()}
   def start do
-    Application.fetch_env!(:exbox, :flags)
+    Application.fetch_env!(:zexbox, :flags)
     |> Enum.into(%{})
     |> start(:default)
   end
@@ -67,10 +67,10 @@ defmodule Exbox.Flags do
 
   Examples:
 
-          iex> Exbox.Flags.variation("my-flag", %{key: "user-key"}, false, :my_tag)
+          iex> Zexbox.Flags.variation("my-flag", %{key: "user-key"}, false, :my_tag)
           true
 
-          iex> Exbox.Flags.variation("my-flag", %{key: "user-key"}, false, :my_tag)
+          iex> Zexbox.Flags.variation("my-flag", %{key: "user-key"}, false, :my_tag)
           {:error, {:not_found, "my-flag"}}
   """
   @spec variation(String.t(), map(), any(), atom()) :: any()

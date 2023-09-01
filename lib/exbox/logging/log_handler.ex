@@ -1,4 +1,4 @@
-defmodule Exbox.Logging.LogHandler do
+defmodule Zexbox.Logging.LogHandler do
   @moduledoc """
   All log events are handled by this module.
 
@@ -11,7 +11,7 @@ defmodule Exbox.Logging.LogHandler do
 
   Examples:
 
-      iex> Exbox.Logging.LogHandler.handle_event([:phoenix, :endpoint, :stop], measurements, metadata, config)
+      iex> Zexbox.Logging.LogHandler.handle_event([:phoenix, :endpoint, :stop], measurements, metadata, config)
       :ok
   """
 

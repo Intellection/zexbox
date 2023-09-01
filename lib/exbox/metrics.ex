@@ -1,16 +1,16 @@
-defmodule Exbox.Metrics do
+defmodule Zexbox.Metrics do
   @moduledoc """
-  A module for handling and standardising metrics in Exbox applications.
+  A module for handling and standardising metrics in Zexbox applications.
 
   To use this module, you must have the Telemetry library installed.
   To do so, add {:telemetry, "~> 1.2.1"} to your list of dependencies in mix.exs.
 
-  If you want to attach metrics to other events, you can use `Exbox.Metrics.attach_telemetry/3`:
+  If you want to attach metrics to other events, you can use `Zexbox.Metrics.attach_telemetry/3`:
 
   ## Examples
 
       def start(_type, _args) do
-        Exbox.Metrics.attach_telemetry(:my_event, [:my, :params], &my_handler/1)
+        Zexbox.Metrics.attach_telemetry(:my_event, [:my, :params], &my_handler/1)
       end
 
   ## Public API
@@ -21,14 +21,14 @@ defmodule Exbox.Metrics do
   - `attach_telemetry/3`: Attaches metrics to the given event with the given params.
   """
 
-  alias Exbox.Metrics.MetricHandler
+  alias Zexbox.Metrics.MetricHandler
 
   @doc """
   Attaches metrics to the Phoenix endpoint stop event.
 
   ## Examples
 
-      iex> Exbox.Metrics.attach_controller_metrics()
+      iex> Zexbox.Metrics.attach_controller_metrics()
       :ok
   """
   @spec attach_controller_metrics() :: :ok
@@ -56,7 +56,7 @@ defmodule Exbox.Metrics do
   end
 
   def start(_type, _args) do
-    Exbox.Metrics.attach_telemetry(:my_event, [:my, :event], &MyAppHandler.my_handler/3)
+    Zexbox.Metrics.attach_telemetry(:my_event, [:my, :event], &MyAppHandler.my_handler/3)
   end
   ```
   In this example, when :my_event is triggered, the telemetry system will call MyAppHandler.my_handler/1 with the captured event data. Ensure that the handler function is implemented appropriately for your specific use case.
@@ -70,7 +70,7 @@ defmodule Exbox.Metrics do
   """
   @spec attach_telemetry(binary(), [atom() | :stop], (any(), any(), any(), any() -> any())) :: :ok
   def attach_telemetry(event, params, function) do
-    if Exbox.Config.capture_telemetry_metric_events?() do
+    if Zexbox.Config.capture_telemetry_metric_events?() do
       :ok =
         :telemetry.attach(
           event,

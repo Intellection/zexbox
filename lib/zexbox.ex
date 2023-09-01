@@ -1,32 +1,32 @@
-defmodule Exbox do
+defmodule Zexbox do
   @moduledoc """
-  Exbox is a package containing common tooling and other functionality
+  Zexbox is a package containing common tooling and other functionality
   for Zappi's Elixir/Phoenix applications.
   It is the Elixir equivalent of the Opsbox, which was built for our Ruby/Rails stack.
-  Supervisor for Exbox.
-  this exists to reduce the amount of boilerplate required to configure Exbox.
-  All GenServers, Supervisors and other processes for Exbox should be started from here.
+  Supervisor for Zexbox.
+  this exists to reduce the amount of boilerplate required to configure Zexbox.
+  All GenServers, Supervisors and other processes for Zexbox should be started from here.
   It also has an entry point point for default opt-in by default functionality like attach_controller_metrics
   """
   use Supervisor
 
   @doc """
-  Start the supervisor for Exbox.
+  Start the supervisor for Zexbox.
   """
   # credo:disable-for-next-line
   def start_link(_args) do
-    start_state = Supervisor.start_link(__MODULE__, nil, name: :exbox)
+    start_state = Supervisor.start_link(__MODULE__, nil, name: :zexbox)
     default_opt_in_configurations()
     start_state
   end
 
   @doc """
-  Initialise the supervisor for Exbox. Set the children for the supervisor here.
+  Initialise the supervisor for Zexbox. Set the children for the supervisor here.
   """
   # credo:disable-for-next-line
   def init(_args) do
     children = [
-      Exbox.Metrics.Connection
+      Zexbox.Metrics.Connection
       # Add other child processes here if needed.
     ]
 
@@ -34,7 +34,7 @@ defmodule Exbox do
   end
 
   defp default_opt_in_configurations do
-    Exbox.Metrics.attach_controller_metrics()
-    Exbox.Logging.attach_controller_logs()
+    Zexbox.Metrics.attach_controller_metrics()
+    Zexbox.Logging.attach_controller_logs()
   end
 end

@@ -1,7 +1,7 @@
-defmodule Exbox.FlagsTest do
+defmodule Zexbox.FlagsTest do
   use ExUnit.Case
   import ExUnit.CaptureLog
-  alias Exbox.Flags
+  alias Zexbox.Flags
   require Logger
 
   defp start_client(tag) do
