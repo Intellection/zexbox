@@ -12,7 +12,7 @@ by adding `exbox` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:zexbox, "~> 0.3.7"}
+    {:zexbox, "~> 0.4.0"}
   ]
 end
 ```
