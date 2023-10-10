@@ -17,6 +17,39 @@ def deps do
 end
 ```
 
+## Configuration
+### LaunchDarkly Feature Flags
+```
+config :zexbox, :flags,
+  sdk_key: "dev-launch-darkly-key",
+  file_datasource: true,
+  send_events: false,
+  file_auto_update: true,
+  file_poll_interval: 1000,
+  feature_store: :ldclient_storage_map,
+  file_paths: ["flags.json"]
+```
+
+### Influx Metrics
+```
+config :zexbox, Zexbox.Metrics.Connection,
+  host: "localhost:8086",
+  auth: [
+    method: :token,
+    token: "token"
+  ],
+  bucket: "my_app",
+  org: "zappi",
+  version: :v2
+```
+
+### Telemetry
+```
+  config :zexbox, :features,
+    capture_telemetry_metric_events: true,
+    capture_telemetry_log_events: true
+```
+
 ## Docker Compose
 
 - Run
