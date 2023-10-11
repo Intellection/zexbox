@@ -4,7 +4,7 @@ defmodule Zexbox.MixProject do
   def project do
     [
       app: :zexbox,
-      version: "0.4.0",
+      version: "0.5.0",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       dialyzer: [plt_add_apps: [:mix, :ex_unit]],
