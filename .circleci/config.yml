@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: cimg/elixir:1.15.4
+      - image: cimg/elixir:1.15.5-erlang-26.0.2
         environment:
           MIX_ENV: test
     steps:
@@ -45,7 +45,7 @@ jobs:
 
   test:
     docker:
-      - image: cimg/elixir:1.15.4
+      - image: cimg/elixir:1.15.5-erlang-26.0.2
         environment:
           MIX_ENV: test
       - image: cimg/postgres:14.6
@@ -64,7 +64,7 @@ jobs:
 
   lint:
     docker:
-      - image: cimg/elixir:1.15.4
+      - image: cimg/elixir:1.15.5-erlang-26.0.2
         environment:
           MIX_ENV: test
     steps:
@@ -95,7 +95,7 @@ jobs:
 
   security:
     docker:
-      - image: cimg/elixir:1.15.4
+      - image: cimg/elixir:1.15.5-erlang-26.0.2
         environment:
           MIX_ENV: test
     steps:
