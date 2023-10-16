@@ -6,8 +6,7 @@
 
 ## Installation
 
-The package is [available in Hex](https://hex.pm/docs/publish) and can be installed
-by adding `zexbox` to your list of dependencies in `mix.exs`:
+The can be installed by adding `zexbox` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
