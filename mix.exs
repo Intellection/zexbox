@@ -12,7 +12,7 @@ defmodule Zexbox.MixProject do
       package: package(),
       deps: deps(),
       name: "Zexbox",
-      source_url: "https://github.com/Intellection/exbox",
+      source_url: "https://github.com/Intellection/zexbox",
       test_coverage: [
         ignore_modules: [
           Zexbox.Metrics,
@@ -58,7 +58,7 @@ defmodule Zexbox.MixProject do
       name: "zexbox",
       files: ~w(lib .formatter.exs mix.exs README* LICENSE*),
       licenses: ["MIT"],
-      links: %{"GitHub" => "https://github.com/Intellection/exbox"}
+      links: %{"GitHub" => "https://github.com/Intellection/zexbox"}
     ]
   end
 end
