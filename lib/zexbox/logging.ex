@@ -29,9 +29,6 @@ defmodule Zexbox.Logging do
   @doc """
   Attaches logging to the given event with the given params.
 
-  ## Examples
-    ## Examples
-
   To attach metrics for a custom event `:my_event` with parameters `[:my, :event]`, and a custom handler function `my_handler/3`, you can do the following:
 
   ```elixir
@@ -45,6 +42,7 @@ defmodule Zexbox.Logging do
     Zexbox.Logging.attach_telemetry(:my_event, [:my, :event], &MyAppHandler.my_handler/3)
   end
   ```
+
   In this example, when :my_event is triggered, the telemetry system will call MyAppHandler.my_handler/1 with the captured event data. Ensure that the handler function is implemented appropriately for your specific use case.
 
   Note: The logs will only be attached if the application environment variable :capture_telemetry_log_events is set to true.
@@ -52,6 +50,7 @@ defmodule Zexbox.Logging do
     - `event` (binary()) - The name of the event to which metrics will be attached.
     - `params` (list(atom())) - A list of parameters representing the context of the event.
     - `function` (any(), any(), any(), any() -> any()) - The function to be called when the event occurs.
+
   Returns :ok if the logs are successfully attached.
   """
   @spec attach_telemetry(binary(), list(atom()), (any(), any(), any(), any() -> any())) :: :ok

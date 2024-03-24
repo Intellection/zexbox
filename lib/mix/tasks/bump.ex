@@ -2,6 +2,7 @@ defmodule Mix.Tasks.Bump do
   @moduledoc """
   Bump version number in mix.exs and create a new git tag.
   """
+
   @doc """
   Runs the task with the given arguments.
   """

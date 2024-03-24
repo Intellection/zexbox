@@ -58,10 +58,11 @@ defmodule Zexbox.Metrics.Client do
   @doc """
   Write a metric to InfluxDB.
 
-  Examples:
+  ## Examples
 
       iex> Zexbox.Metrics.Client.write_metric(%ControllerSeries{})
       {:ok, %ControllerSeries{}}
+
   """
   @spec write_metric(series()) :: tuple()
   def write_metric(%Zexbox.Metrics.Series{} = metrics) do

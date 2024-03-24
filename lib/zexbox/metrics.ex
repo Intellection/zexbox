@@ -41,7 +41,6 @@ defmodule Zexbox.Metrics do
   end
 
   @doc """
-
   Attaches metrics to the given event with the given params.
 
   ## Examples

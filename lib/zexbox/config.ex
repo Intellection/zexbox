@@ -1,8 +1,11 @@
 defmodule Zexbox.Config do
   @moduledoc """
   Zexbox configuration module.
+
   All configurations have a default value, which can be overridden in the application config.
+
   The application config is keyed in the following way:
+
   ```elixir
   config :zexbox, :features, [
     capture_telemetry_metric_events: true,

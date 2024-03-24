@@ -9,26 +9,35 @@ defmodule Zexbox.Flags do
   To start the client, call Zexbox.Flags.start/2 when starting your application
   with a map of config options and an optional tag:
 
-      iex> def start(_type, _args) do
-      iex>   Zexbox.Flags.start(%{sdk_key: "sdk-key", private_attributes: [:email]})
+  ```elixir
+  def start(_type, _args) do
+    Zexbox.Flags.start(%{sdk_key: "sdk-key", private_attributes: [:email]})
+    ...
+  end
+  ```
 
   To make sure that the client shuts down, you should call Zexbox.Flags.stop/1
   when your application shuts down:
 
-      iex> def stop(_state) do
-      iex>   Zexbox.Flags.stop()
+  ```elixir
+  def stop(_type, _args) do
+    Zexbox.Flags.stop()
+    ...
+  end
+  ```
   """
 
   @doc """
   Starts the LaunchDarkly client with the given config and tag.
 
-  Examples:
+  ## Examples
 
-        iex> Zexbox.Flags.start(%{sdk_key: "sdk-key"}, :my_tag)
-        :ok
+          iex> Zexbox.Flags.start(%{sdk_key: "sdk-key"}, :my_tag)
+          :ok
 
-        iex> Zexbox.Flags.start(%{sdk_key: "sdk-key"}, :my_tag)
-        {:error, {:already_started, #PID<0.602.0>}}
+          iex> Zexbox.Flags.start(%{sdk_key: "sdk-key"}, :my_tag)
+          {:error, {:already_started, #PID<0.602.0>}}
+
   """
   @spec start() :: :ok | {:error, atom(), term()}
   def start do
@@ -65,13 +74,14 @@ defmodule Zexbox.Flags do
   @doc """
   Gets the variation of a flag for the given key, context, default value, and tag.
 
-  Examples:
+  ## Examples
 
           iex> Zexbox.Flags.variation("my-flag", %{key: "user-key"}, false, :my_tag)
           true
 
           iex> Zexbox.Flags.variation("my-flag", %{key: "user-key"}, false, :my_tag)
           {:error, {:not_found, "my-flag"}}
+
   """
   @spec variation(String.t(), map(), any(), atom()) :: any()
   def variation(key, context, default, tag) do
@@ -85,7 +95,7 @@ defmodule Zexbox.Flags do
   def variation(key, context_key, default), do: variation(key, context_key, default, :default)
 
   @doc """
-    Stops the ldclient with the given tag.
+  Stops the ldclient with the given tag.
   """
   @spec stop(atom()) :: :ok
   def stop(tag) do
@@ -93,7 +103,7 @@ defmodule Zexbox.Flags do
   end
 
   @doc """
-    Stops the ldclient with the default tag.
+  Stops the ldclient with the default tag.
   """
   @spec stop() :: :ok
   def stop, do: stop(:default)
