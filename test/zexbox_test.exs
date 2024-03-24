@@ -1,7 +1,7 @@
 defmodule ZexboxTest do
   use ExUnit.Case
 
-  setup %{} do
+  setup do
     Application.put_env(:zexbox, Zexbox.Metrics.Connection, [])
   end
 
