@@ -1,4 +1,4 @@
-Copyright (c) 2023 Zappistore
+Copyright (c) 2024 Zappistore
 
 MIT License
 
