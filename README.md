@@ -17,8 +17,10 @@ end
 ```
 
 ## Configuration
+
 ### LaunchDarkly Feature Flags
-```
+
+```elixir
 config :zexbox, :flags,
   sdk_key: "dev-launch-darkly-key",
   file_datasource: true,
@@ -30,7 +32,8 @@ config :zexbox, :flags,
 ```
 
 ### Influx Metrics
-```
+
+```elixir
 config :zexbox, Zexbox.Metrics.Connection,
   host: "localhost:8086",
   auth: [
@@ -43,7 +46,8 @@ config :zexbox, Zexbox.Metrics.Connection,
 ```
 
 ### Telemetry
-```
+
+```elixir
   config :zexbox, :features,
     capture_telemetry_metric_events: true,
     capture_telemetry_log_events: true
@@ -53,7 +57,7 @@ config :zexbox, Zexbox.Metrics.Connection,
 
 - Run
 
-```
+```bash
 docker compose up
 ```
 
