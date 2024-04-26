@@ -120,6 +120,23 @@ end
 
 This will attach the telemetry and logging events to your controllers (assuming that they are enable in the `:features` config)
 
+#### Adding Custom Controller Metrics
+
+You can easily add your own controller metrics using the `Zexbox.Metrics.Client` module
+
+```elixir
+metric = %Zexbox.Metrics.Series.Generic{
+  measurement: "my_measurement",
+  fields: %{
+    "my_field" => 1
+  },
+  tags: %{
+    "my_tag" => "my_value"
+  }
+}
+Zexbox.Metrics.Client.write_metric(metric)
+```
+
 ## Copyright and License
 
 Copyright (c) 2024, Zappistore.
