@@ -16,9 +16,19 @@ def deps do
 end
 ```
 
-## Configuration
+## LaunchDarkly Feature Flags
 
-### LaunchDarkly Feature Flags
+### Configuration
+
+Configuration is fairly simple, with the only required piece of configuration being the `sdk_key`. For production environments we recommend also including `:email` as a private attribute:
+
+```elixir
+config :zexbox, :flags,
+  sdk_key: System.fetch_env!("LAUNCH_DARKLY_SDK_KEY"),
+  private_attributes: [:email]
+```
+
+For local development and testing you'll probably want to [read flags from a local file](https://docs.launchdarkly.com/sdk/features/flags-from-files) and ensure there is no interaction with this API. While the two configurations will be very similar you should have different ones to put to different files. You're configurations will look something like this following:
 
 ```elixir
 config :zexbox, :flags,
@@ -31,7 +41,41 @@ config :zexbox, :flags,
   file_paths: ["flags.json"]
 ```
 
-### Influx Metrics
+### Implementing
+
+In order to use feature flags you need to start the LaunchDarkly client using. You should do this in the `start/2` function of your `Application` module:
+
+```elixir
+def start(_type, _args) do
+  Zexbox.Flags.start()
+  ...
+end
+```
+
+You should laso make sure that the client shuts down when your app does in the `stop/2` function of your `Application` module:
+
+```elixir
+def stop(_type, _args) do
+  Zexbox.Flags.stop()
+  ...
+end
+```
+
+Evaluating a flag can be achieved by simply calling the `variation/3` function.
+
+```elixir
+Zexbox.Flags.variation(
+  "my-flag",
+  %{key: "user-hash", email: "user@email.com"},
+  "my_default_value"
+)
+```
+
+## Metrics and Logging
+
+### Configuration
+
+In order to setup metrics with InfluxDB you'll need to add the following configuration
 
 ```elixir
 config :zexbox, Zexbox.Metrics.Connection,
@@ -45,27 +89,39 @@ config :zexbox, Zexbox.Metrics.Connection,
   version: :v2
 ```
 
-### Telemetry
+By default both metrics and logging will be enabled, you can customise this with the following configuration
 
 ```elixir
-  config :zexbox, :features,
-    capture_telemetry_metric_events: true,
-    capture_telemetry_log_events: true
+config :zexbox, :features,
+  capture_telemetry_metric_events: true,
+  capture_telemetry_log_events: true
 ```
 
-## Docker Compose
+### Implementing
 
-- Run
+In order to make use of metrics and logging you'll need to add the `Zexbox` module to your application's `Supervisor` tree
 
-```bash
-docker compose up
+```elixir
+defmodule MyApp.Application do
+  use Application
+
+  @impl Application
+  def start(_type, args) do
+    ...
+    children = [
+      ...
+      {Zexbox, []}
+    ]
+    ...
+    Supervisor.start_link(children, opts)
+  end
+end
 ```
 
-- For grafana browse to `http://localhost:3000/`
-- use `http://influxdb:8086` as a data source
+This will attach the telemetry and logging events to your controllers (assuming that they are enable in the `:features` config)
 
 ## Copyright and License
 
-Copyright (c) 2023, Zappistore.
+Copyright (c) 2024, Zappistore.
 
 Zexbox source code is licensed under the [MIT License](LICENSE.md).
