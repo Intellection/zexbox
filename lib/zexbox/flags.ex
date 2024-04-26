@@ -54,15 +54,6 @@ defmodule Zexbox.Flags do
     sdk_key
     |> String.to_charlist()
     |> :ldclient.start_instance(tag, parse_config(config))
-  rescue
-    # Well this is annoying. When attempting to start the LDclient twice it errors out rather
-    # than returning a map of the form {:error, {:already_started, #PID<0.602.0>}} (which is the desired behaviour).
-    # Having a look at the source code  shows that this is a known issue since there is just a TODO stating:
-    # 'check if Tag already exists and return already_started error'.
-    # The MatchError is a struct of the form %MatchError{term: {:error, {:already_started, #PID<0.602.0>}}
-    # so we just return the 'term' attribute, giving us what we want.
-    e in MatchError ->
-      e.term
   end
 
   @doc """
@@ -112,10 +103,5 @@ defmodule Zexbox.Flags do
     config
     |> Map.delete(:sdk_key)
     |> Map.update(:file_paths, [], fn paths -> Enum.map(paths, &String.to_charlist/1) end)
-    |> Map.merge(%{
-      http_options: %{
-        tls_options: :ldclient_config.tls_basic_options()
-      }
-    })
   end
 end

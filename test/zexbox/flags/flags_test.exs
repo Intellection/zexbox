@@ -44,7 +44,7 @@ defmodule Zexbox.FlagsTest do
     end
 
     test "when an ldclient instance has already been started", %{config_map: config_map, tag: tag} do
-      assert {:error, {:already_started, _pid}} = Flags.start(config_map, tag)
+      assert {:error, :already_started, _pid} = Flags.start(config_map, tag)
     end
   end
 
