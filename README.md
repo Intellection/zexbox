@@ -28,7 +28,7 @@ config :zexbox, :flags,
   private_attributes: [:email]
 ```
 
-For local development and testing you'll probably want to [read flags from a local file](https://docs.launchdarkly.com/sdk/features/flags-from-files) and ensure there is no interaction with this API. While the two configurations will be very similar you should have different ones to put to different files. You're configurations will look something like this following:
+For local development and testing you'll probably want to [read flags from a local file](https://docs.launchdarkly.com/sdk/features/flags-from-files) and ensure there is no interaction with the LaunchDarkly API. While the two configurations will be very similar you should have different ones to put to different files. You're configurations will look something like this following:
 
 ```elixir
 config :zexbox, :flags,
