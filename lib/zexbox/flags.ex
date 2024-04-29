@@ -2,16 +2,12 @@ defmodule Zexbox.Flags do
   @moduledoc """
   An Elixir wrapper around the LaunchDarkly Erlang client
 
-  To use this module you must have the LaunchDarkly Erlang client installed.
-  To do so, add {:ldclient, "~> 2.0.0", hex: :launchdarkly_server_sdk} to your
-  list of dependencies in mix.exs.
-
-  To start the client, call Zexbox.Flags.start/2 when starting your application
+  To start the client, call `Zexbox.Flags.start/2` when starting your application
   with a map of config options and an optional tag:
 
   ```elixir
   def start(_type, _args) do
-    Zexbox.Flags.start(%{sdk_key: "sdk-key", private_attributes: [:email]})
+    Zexbox.Flags.start()
     ...
   end
   ```
@@ -28,15 +24,14 @@ defmodule Zexbox.Flags do
   """
 
   @doc """
-  Starts the LaunchDarkly client with the given config and tag.
+  Starts the LaunchDarkly client using the `:flags` application config and the `:default` tag.
 
   ## Examples
 
-          iex> Zexbox.Flags.start(%{sdk_key: "sdk-key"}, :my_tag)
-          :ok
-
-          iex> Zexbox.Flags.start(%{sdk_key: "sdk-key"}, :my_tag)
-          {:error, {:already_started, #PID<0.602.0>}}
+      iex> Zexbox.Flags.start()
+      :ok
+      iex> Zexbox.Flags.start()
+      {:error, :already_started, #PID<0.602.0>}
 
   """
   @spec start() :: :ok | {:error, atom(), term()}
@@ -48,6 +43,15 @@ defmodule Zexbox.Flags do
 
   @doc """
   Starts the LaunchDarkly client with the given config and tag.
+
+  ## Examples
+
+      iex> Zexbox.Flags.start(%{sdk_key: "my-sdk-key"}, :my_tag)
+      :ok
+
+      iex> Zexbox.Flags.start(%{sdk_key: "my-sdk-key"}, :my_tag)
+      {:error, :already_started, #PID<0.602.0>}
+
   """
   @spec start(map(), atom()) :: :ok | {:error, atom(), term()}
   def start(%{sdk_key: sdk_key} = config, tag) do
@@ -57,7 +61,16 @@ defmodule Zexbox.Flags do
   end
 
   @doc """
-  Starts the LaunchDarkly client with the given config.
+  Starts the LaunchDarkly client with the given config and the `:default` tag.
+
+  ## Examples
+
+      iex> Zexbox.Flags.start(%{sdk_key: "my-sdk-key"})
+      :ok
+
+      iex> Zexbox.Flags.start(%{sdk_key: "my-sdk-key"})
+      {:error, :already_started, #PID<0.602.0>}
+
   """
   @spec start(map()) :: :ok | {:error, atom(), any()}
   def start(config), do: start(config, :default)
@@ -67,11 +80,11 @@ defmodule Zexbox.Flags do
 
   ## Examples
 
-          iex> Zexbox.Flags.variation("my-flag", %{key: "user-key"}, false, :my_tag)
-          true
+      iex> Zexbox.Flags.variation("my-flag", %{key: "user-key"}, false, :my_tag)
+      true
 
-          iex> Zexbox.Flags.variation("my-flag", %{key: "user-key"}, false, :my_tag)
-          {:error, {:not_found, "my-flag"}}
+      iex> Zexbox.Flags.variation("my-flag", %{key: "user-key"}, false, :my_tag)
+      {:error, {:not_found, "my-flag"}}
 
   """
   @spec variation(String.t(), map(), any(), atom()) :: any()
@@ -80,7 +93,16 @@ defmodule Zexbox.Flags do
   end
 
   @doc """
-  Gets the variation of a flag for the given key, context, and default value.
+  Gets the variation of a flag for the given key, context, and default tag.
+
+  ## Examples
+
+      iex> Zexbox.Flags.variation("my-flag", %{key: "user-key"}, false)
+      true
+
+      iex> Zexbox.Flags.variation("my-flag", %{key: "user-key"}, false)
+      {:error, {:not_found, "my-flag"}}
+
   """
   @spec variation(String.t(), map(), any()) :: any()
   def variation(key, context_key, default), do: variation(key, context_key, default, :default)

@@ -1,14 +1,11 @@
 defmodule Zexbox.Logging.LogHandler do
   @moduledoc """
-  Handles all log events
+  Handles all log events.
   """
   require Logger
 
   @doc """
-  This function is called by the Phoenix endpoint when a controller action is
-  started and finished.
-
-  This allows us to use kibana for log inspection and monitoring
+  This function is called by the Phoenix endpoint when a controller action is started and finished.
 
   ## Examples
 
