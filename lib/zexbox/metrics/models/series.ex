@@ -1,6 +1,7 @@
 defmodule Zexbox.Metrics.Series do
   @moduledoc """
   This module defines a simple struct to write metrics to InfluxDB.
+
   the attributes are:
   * measurement - The name of the measurement
   * fields - The fields of the measurement, these are the values you want to aggregate on

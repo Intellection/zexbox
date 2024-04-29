@@ -18,36 +18,36 @@ defmodule Zexbox.Metrics.Client do
   ```
 
   ## Writing Metrics
-    The main function provided by this module is write_metric/1. It accepts a metric data structure and writes it to InfluxDB.
+  The main function provided by this module is write_metric/1. It accepts a metric data structure and writes it to InfluxDB.
 
   ## Examples
 
-  ## Writing Custom metrics
+  ### Writing Custom metrics
 
-    ```elixir
-    iex> metric = %Zexbox.Metrics.Series.Generic{
-    ...>   measurement: "my_measurement",
-    ...>   fields: %{
-    ...>     "my_field" => 1
-    ...>   },
-    ...>   tags: %{
-    ...>     "my_tag" => "my_value"
-    ...>   }
-    ...> }
-    iex> Zexbox.Metrics.Client.write_metric(metric)
-    {:ok, %Zexbox.Metrics.Series.Generic{
-      measurement: "my_measurement",
-      fields: %{
-        "my_field" => 1
-      },
-      tags: %{
-        "my_tag" => "my_value"
-      }
-    }}
-    ```
+  ```elixir
+  iex> metric = %Zexbox.Metrics.Series.Generic{
+  ...>   measurement: "my_measurement",
+  ...>   fields: %{
+  ...>     "my_field" => 1
+  ...>   },
+  ...>   tags: %{
+  ...>     "my_tag" => "my_value"
+  ...>   }
+  ...> }
+  iex> Zexbox.Metrics.Client.write_metric(metric)
+  {:ok, %Zexbox.Metrics.Series.Generic{
+    measurement: "my_measurement",
+    fields: %{
+      "my_field" => 1
+    },
+    tags: %{
+      "my_tag" => "my_value"
+    }
+  }}
+  ```
 
-    ### Error Handling
-    If there is an error while writing the metric, the function will log the error using the Logger module. without crashing the process
+  ### Error Handling
+  If there is an error while writing the metric, the function will log the error using the Logger module without crashing the process,
   """
 
   alias Zexbox.Metrics.Connection

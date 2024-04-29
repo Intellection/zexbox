@@ -50,7 +50,7 @@ defmodule Zexbox.MixProject do
   end
 
   defp description() do
-    "Common tooling and functionality for our Elixir applications"
+    "Logging, Metrics and Feature Flagging in Elixir."
   end
 
   defp package() do
