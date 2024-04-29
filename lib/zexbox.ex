@@ -2,7 +2,7 @@ defmodule Zexbox do
   @moduledoc """
   The Zexbox Supervisor module.
 
-  This needs to be to your applicaiton's supervisor tree in order to enable metrics and logging in
+  This needs to be to your application's supervisor tree in order to enable metrics and logging in
   your Phoenix controllers.
   """
   use Supervisor
