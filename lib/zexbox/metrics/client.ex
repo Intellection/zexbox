@@ -47,7 +47,7 @@ defmodule Zexbox.Metrics.Client do
   ```
 
   ### Error Handling
-  If there is an error while writing the metric, the function will log the error using the Logger module. without crashing the process
+  If there is an error while writing the metric, the function will log the error using the Logger module without crashing the process,
   """
 
   alias Zexbox.Metrics.Connection
