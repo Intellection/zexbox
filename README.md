@@ -11,7 +11,7 @@ The can be installed by adding `zexbox` to your list of dependencies in `mix.exs
 ```elixir
 def deps do
   [
-    {:zexbox, "~> 0.7.1"}
+    {:zexbox, "~> 0.8.0"}
   ]
 end
 ```
