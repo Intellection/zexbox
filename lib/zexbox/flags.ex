@@ -122,8 +122,6 @@ defmodule Zexbox.Flags do
   def stop, do: stop(:default)
 
   defp parse_config(config) do
-    config
-    |> Map.delete(:sdk_key)
-    |> Map.update(:file_paths, [], fn paths -> Enum.map(paths, &String.to_charlist/1) end)
+    Map.delete(config, :sdk_key)
   end
 end
