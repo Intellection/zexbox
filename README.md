@@ -11,7 +11,7 @@ The can be installed by adding `zexbox` to your list of dependencies in `mix.exs
 ```elixir
 def deps do
   [
-    {:zexbox, "~> 0.7.0"}
+    {:zexbox, "~> 0.7.1"}
   ]
 end
 ```
@@ -125,7 +125,7 @@ This will attach the telemetry and logging events to your controllers (assuming 
 You can easily add your own controller metrics using the `Zexbox.Metrics.Client` module
 
 ```elixir
-metric = %Zexbox.Metrics.Series.Generic{
+metric = %Zexbox.Metrics.Series{
   measurement: "my_measurement",
   fields: %{
     "my_field" => 1
