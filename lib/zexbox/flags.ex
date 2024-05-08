@@ -122,6 +122,12 @@ defmodule Zexbox.Flags do
   def stop, do: stop(:default)
 
   defp parse_config(config) do
-    Map.delete(config, :sdk_key)
+    config
+    |> Map.delete(:sdk_key)
+    |> Map.merge(%{
+      http_options: %{
+        tls_options: :ldclient_config.tls_basic_options()
+      }
+    })
   end
 end
