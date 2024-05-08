@@ -124,6 +124,10 @@ defmodule Zexbox.Flags do
   defp parse_config(config) do
     config
     |> Map.delete(:sdk_key)
-    |> Map.update(:file_paths, [], fn paths -> Enum.map(paths, &String.to_charlist/1) end)
+    |> Map.merge(%{
+      http_options: %{
+        tls_options: :ldclient_config.tls_basic_options()
+      }
+    })
   end
 end
