@@ -50,7 +50,9 @@ defmodule Zexbox.Metrics.Client do
   If there is an error while writing the metric, the function will log the error using the Logger module without crashing the process,
   """
 
-  alias Zexbox.Metrics.{ControllerSeries, Connection, Series}
+  alias Zexbox.Metrics.Connection
+  alias Zexbox.Metrics.ControllerSeries
+  alias Zexbox.Metrics.Series
   require Logger
 
   @type series :: %ControllerSeries{} | Series.t()
@@ -65,7 +67,7 @@ defmodule Zexbox.Metrics.Client do
 
   """
   @spec write_metric(series()) :: tuple()
-  def write_metric(%Zexbox.Metrics.Series{} = metrics) do
+  def write_metric(%Series{} = metrics) do
     metrics
     |> Map.from_struct()
     |> write_to_influx()
