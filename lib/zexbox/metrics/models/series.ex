@@ -20,4 +20,21 @@ defmodule Zexbox.Metrics.Series do
             fields: %{},
             tags: %{},
             timestamp: nil
+
+  def new(measurement) do
+    %__MODULE__{
+      measurement: measurement,
+      timestamp: DateTime.utc_now(),
+      fields: %{},
+      tags: %{}
+    }
+  end
+
+  def field(series, key, value) do
+    %{series | fields: Map.put(series.fields, key, value)}
+  end
+
+  def tag(series, key, value) do
+    %{series | tags: Map.put(series.tags, key, value)}
+  end
 end

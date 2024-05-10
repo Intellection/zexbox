@@ -50,10 +50,10 @@ defmodule Zexbox.Metrics.Client do
   If there is an error while writing the metric, the function will log the error using the Logger module without crashing the process,
   """
 
-  alias Zexbox.Metrics.Connection
+  alias Zexbox.Metrics.{ControllerSeries, Connection, Series}
   require Logger
 
-  @type series :: %Zexbox.Metrics.ControllerSeries{}
+  @type series :: %ControllerSeries{} | Series.t()
 
   @doc """
   Write a metric to InfluxDB.
