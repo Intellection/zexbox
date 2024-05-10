@@ -30,4 +30,28 @@ defmodule Zexbox.Metrics.SeriesTest do
     assert metric.tags == tags
     assert metric.timestamp == timestamp
   end
+
+  test "creates a new struct with the new/1 function" do
+    measurement = "custom_measurement"
+    metric = Series.new(measurement)
+
+    assert metric.measurement == measurement
+    refute is_nil(metric.timestamp)
+  end
+
+  test "field/3" do
+    metric = Series.new("my_measurement")
+    metric = Series.field(metric, :field1, 42)
+    metric = Series.field(metric, :field2, "hello")
+
+    assert metric.fields == %{field1: 42, field2: "hello"}
+  end
+
+  test "tag/3" do
+    metric = Series.new("my_measurement")
+    metric = Series.tag(metric, :tag1, "tag_value")
+    metric = Series.tag(metric, :tag2, 123)
+
+    assert metric.tags == %{tag1: "tag_value", tag2: 123}
+  end
 end

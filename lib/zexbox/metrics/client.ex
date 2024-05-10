@@ -51,9 +51,11 @@ defmodule Zexbox.Metrics.Client do
   """
 
   alias Zexbox.Metrics.Connection
+  alias Zexbox.Metrics.ControllerSeries
+  alias Zexbox.Metrics.Series
   require Logger
 
-  @type series :: %Zexbox.Metrics.ControllerSeries{}
+  @type series :: %ControllerSeries{} | Series.t()
 
   @doc """
   Write a metric to InfluxDB.
@@ -65,7 +67,7 @@ defmodule Zexbox.Metrics.Client do
 
   """
   @spec write_metric(series()) :: tuple()
-  def write_metric(%Zexbox.Metrics.Series{} = metrics) do
+  def write_metric(%Series{} = metrics) do
     metrics
     |> Map.from_struct()
     |> write_to_influx()
