@@ -5,7 +5,7 @@ defmodule Zexbox.Flags do
   To start the client, call `Zexbox.Flags.start/2` when starting your application
   with a map of config options and an optional tag:
 
-  ```elixir
+  ```
   def start(_type, _args) do
     Zexbox.Flags.start()
     ...
@@ -15,31 +15,13 @@ defmodule Zexbox.Flags do
   To make sure that the client shuts down, you should call Zexbox.Flags.stop/1
   when your application shuts down:
 
-  ```elixir
+  ```
   def stop(_type, _args) do
     Zexbox.Flags.stop()
     ...
   end
   ```
   """
-
-  @doc """
-  Starts the LaunchDarkly client using the `:flags` application config and the `:default` tag.
-
-  ## Examples
-
-      iex> Zexbox.Flags.start()
-      :ok
-      iex> Zexbox.Flags.start()
-      {:error, :already_started, #PID<0.602.0>}
-
-  """
-  @spec start() :: :ok | {:error, atom(), term()}
-  def start do
-    Application.fetch_env!(:zexbox, :flags)
-    |> Enum.into(%{})
-    |> start(:default)
-  end
 
   @doc """
   Starts the LaunchDarkly client with the given config and tag.
@@ -61,19 +43,38 @@ defmodule Zexbox.Flags do
   end
 
   @doc """
-  Starts the LaunchDarkly client with the given config and the `:default` tag.
+  Starts the LaunchDarkly client with the given config or the given tag.
 
   ## Examples
 
       iex> Zexbox.Flags.start(%{sdk_key: "my-sdk-key"})
       :ok
-
       iex> Zexbox.Flags.start(%{sdk_key: "my-sdk-key"})
+      {:error, :already_started, #PID<0.602.0>}
+      iex>
+
+  """
+  @spec start(atom()) :: :ok | {:error, atom(), term()}
+  def start(name) when is_atom(name) do
+    Application.fetch_env!(:zexbox, :flags)
+    |> Enum.into(%{})
+    |> start(name)
+  end
+
+  @doc """
+  Starts the LaunchDarkly client using the `:flags` application config and the `:default` tag.
+
+  ## Examples
+
+      iex> Zexbox.Flags.start()
+      :ok
+      iex> Zexbox.Flags.start()
       {:error, :already_started, #PID<0.602.0>}
 
   """
-  @spec start(map()) :: :ok | {:error, atom(), any()}
-  def start(config), do: start(config, :default)
+  @spec start() :: :ok | {:error, atom(), term()}
+  def start,
+    do: start(:default)
 
   @doc """
   Gets the variation of a flag for the given key, context, default value, and tag.

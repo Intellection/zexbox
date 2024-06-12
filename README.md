@@ -11,7 +11,7 @@ The can be installed by adding `zexbox` to your list of dependencies in `mix.exs
 ```elixir
 def deps do
   [
-    {:zexbox, "~> 0.8.0"}
+    {:zexbox, "~> 1.0.0"}
   ]
 end
 ```
@@ -43,7 +43,7 @@ config :zexbox, :flags,
 
 ### Implementing
 
-In order to use feature flags you need to start the LaunchDarkly client using. You should do this in the `start/2` function of your `Application` module:
+In order to use feature flags you need to start the LaunchDarkly client. You should do this in the `start/2` function of your `Application` module:
 
 ```elixir
 def start(_type, _args) do
@@ -52,11 +52,32 @@ def start(_type, _args) do
 end
 ```
 
-You should laso make sure that the client shuts down when your app does in the `stop/2` function of your `Application` module:
+This will initialise a LauncDarkly client with the `:default` tag and using the configuration you've defined in your app.
+
+If you wish to use a different tag you can make use of `Zexbox.Flags.start/1`
+
+```elixir
+Zexbox.Flags.start(:my_tag)
+```
+
+Additionally, if you don't want to make use of the application config you can use `Zexbox.Flags.start/2`
+
+```elixir
+Zexbox.Flags.start(
+  %{
+    sdk_key: "my-sdk-key", # This key is required
+    private_attributes: [:email]
+  },
+  :my_tag
+)
+```
+
+You can then shut the client down when your app does in the `stop/2` function of your `Application` module:
 
 ```elixir
 def stop(_type, _args) do
-  Zexbox.Flags.stop()
+  Zexbox.Flags.stop() # Stops the :default client
+  # Zexbox.Flags.stop(:my_tag)
   ...
 end
 ```
@@ -71,35 +92,55 @@ Zexbox.Flags.variation(
 )
 ```
 
-## Metrics and Logging
+## Logging
 
-### Configuration
+Default logging can be attached to your controllers by calling `Zexbox.Logging.attach_controller_logs!` in the `start/2` function of your `Application` module:
 
-In order to setup metrics with InfluxDB you'll need to add the following configuration
+```elixir
+def start(_type, _args) do
+  Zexbox.Logging.attach_controller_logs!()
+  ...
+end
+```
+
+This sets up handlers for the `[:phoenix, :endpoint, :stop]` and `[:phoenix, :endpoint, :start]` events. The handlers are named `"phoenix_controller_logs_stop"` and `"phoenix_controller_logs_start"`.
+
+The logs for the start and stop will look like the following respectively
+
+`LogHandler.handle_event/4 called with <measurements>, <inspect(metadata)>, <config> on stop`
+
+and 
+
+`LogHandler.handle_event/4 called with <measurements>, <inspect(metadata)>, <config> on start`
+
+### Adding your own logs
+
+Adding your own logs is as simple as calling the `Zexbox.Telementry.attach/4` (which is just a wrapper around :telemetry.attach/4)
+
+```elixir
+Zexbox.Telemetry.attach(:my_event, [:my, :event], &MyAppHandler.my_handler/3, nil)
+```
+
+## Metrics
+
+In order to setup metrics with InfluxDB you'll need to add the following configuration:
 
 ```elixir
 config :zexbox, Zexbox.Metrics.Connection,
-  host: "localhost:8086",
   auth: [
     method: :token,
     token: "token"
   ],
-  bucket: "my_app",
+  host: "localhost",
+  port: "8086",
+  version: :v2,
   org: "zappi",
-  version: :v2
+  bucket: "my_app"
 ```
 
-By default both metrics and logging will be enabled, you can customise this with the following configuration
+A more indepth explanation can be found in the `Instream.Connection` [hexdocs](https://hexdocs.pm/instream/Instream.html).
 
-```elixir
-config :zexbox, :features,
-  capture_telemetry_metric_events: true,
-  capture_telemetry_log_events: true
-```
-
-### Implementing
-
-In order to make use of metrics and logging you'll need to add the `Zexbox` module to your application's `Supervisor` tree
+In order to make use of metrics you'll need to add the `Zexbox` module to your application's `Supervisor` tree
 
 ```elixir
 defmodule MyApp.Application do
@@ -110,7 +151,7 @@ defmodule MyApp.Application do
     ...
     children = [
       ...
-      {Zexbox, []}
+      {Zexbox.Metrics, []}
     ]
     ...
     Supervisor.start_link(children, opts)
@@ -118,9 +159,9 @@ defmodule MyApp.Application do
 end
 ```
 
-This will attach the telemetry and logging events to your controllers (assuming that they are enable in the `:features` config)
+This will write metrics to InfluxDB after every Phoenix DB request. The structure of the metrics is defined by the  `Zexbox.Metrics.ControllerSeries` module.
 
-#### Adding Custom Controller Metrics
+### Adding Custom Controller Metrics
 
 You can easily add your own controller metrics using the `Zexbox.Metrics.Client` module
 
