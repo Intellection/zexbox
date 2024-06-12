@@ -18,7 +18,7 @@ defmodule Zexbox.Logging do
       iex> Logging.attach_controller_logs()
       :ok
       iex> Logging.attach_controller_logs()
-      ** (ArgumentError) event already exists
+      ** (RuntimeError) event already exists
 
   """
   @spec attach_controller_logs!() :: :ok
@@ -41,7 +41,7 @@ defmodule Zexbox.Logging do
 
     case {stop_result, start_result} do
       {:ok, :ok} -> :ok
-      _error -> raise ArgumentError, "Phoenix controller logs already attached"
+      _error -> raise "Phoenix controller logs already attached"
     end
   end
 end
