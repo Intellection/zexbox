@@ -73,8 +73,7 @@ defmodule Zexbox.Flags do
 
   """
   @spec start() :: :ok | {:error, atom(), term()}
-  def start,
-    do: start(:default)
+  def start, do: start(:default)
 
   @doc """
   Gets the variation of a flag for the given key, context, default value, and tag.
