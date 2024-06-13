@@ -103,13 +103,11 @@ def start(_type, _args) do
 end
 ```
 
-This sets up handlers for the `[:phoenix, :endpoint, :stop]` and `[:phoenix, :endpoint, :start]` events. The handlers are named `"phoenix_controller_logs_stop"` and `"phoenix_controller_logs_start"`.
-
-The logs for the start and stop will look like the following respectively
+This sets up handlers for the `[:phoenix, :endpoint, :stop]` and `[:phoenix, :endpoint, :start]` events. The handlers are named `"phoenix_controller_logs_stop"` and `"phoenix_controller_logs_start"` and will look like the following respectively
 
 `LogHandler.handle_event/4 called with <measurements>, <inspect(metadata)>, <config> on stop`
 
-and 
+and
 
 `LogHandler.handle_event/4 called with <measurements>, <inspect(metadata)>, <config> on start`
 
@@ -138,7 +136,7 @@ config :zexbox, Zexbox.Metrics.Connection,
   bucket: "my_app"
 ```
 
-A more indepth explanation can be found in the `Instream.Connection` [hexdocs](https://hexdocs.pm/instream/Instream.html).
+A more indepth explanation on the configuration can be found in the `Instream.Connection` [hexdocs](https://hexdocs.pm/instream/Instream.html).
 
 In order to make use of metrics you'll need to add the `Zexbox` module to your application's `Supervisor` tree
 

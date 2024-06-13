@@ -5,7 +5,7 @@ defmodule Zexbox.Flags do
   To start the client, call `Zexbox.Flags.start/2` when starting your application
   with a map of config options and an optional tag:
 
-  ```
+  ```elixir
   def start(_type, _args) do
     Zexbox.Flags.start()
     ...
@@ -15,7 +15,7 @@ defmodule Zexbox.Flags do
   To make sure that the client shuts down, you should call Zexbox.Flags.stop/1
   when your application shuts down:
 
-  ```
+  ```elixir
   def stop(_type, _args) do
     Zexbox.Flags.stop()
     ...
