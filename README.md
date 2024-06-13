@@ -6,8 +6,6 @@
 
 ## Installation
 
-The can be installed by adding `zexbox` to your list of dependencies in `mix.exs`:
-
 ```elixir
 def deps do
   [
@@ -72,17 +70,17 @@ Zexbox.Flags.start(
 )
 ```
 
-You can then shut the client down when your app does in the `stop/2` function of your `Application` module:
+You can then shut the `:default` client down when your app does in the `Zexbox.Flags.stop/0` function of your `Application` module:
 
 ```elixir
 def stop(_type, _args) do
-  Zexbox.Flags.stop() # Stops the :default client
-  # Zexbox.Flags.stop(:my_tag)
-  ...
+  Zexbox.Flags.stop()
 end
 ```
 
-Evaluating a flag can be achieved by simply calling the `variation/3` function.
+Stopping a client with a custom tag can be done using the `Zexbox.Flags.stop/1` function.
+
+Evaluating a flag can be achieved by simply calling the `Zexbox.Flags.variation/3` function.
 
 ```elixir
 Zexbox.Flags.variation(
@@ -113,7 +111,7 @@ and
 
 ### Adding your own logs
 
-Adding your own logs is as simple as calling the `Zexbox.Telementry.attach/4` (which is just a wrapper around :telemetry.attach/4)
+Adding your own logs is as simple as calling the `Zexbox.Telementry.attach/4` (which is just a wrapper around `:telemetry.attach/4`)
 
 ```elixir
 Zexbox.Telemetry.attach(:my_event, [:my, :event], &MyAppHandler.my_handler/3, nil)

@@ -35,7 +35,7 @@ defmodule Zexbox.Flags do
       {:error, :already_started, #PID<0.602.0>}
 
   """
-  @spec start(map(), atom()) :: :ok | {:error, atom(), term()}
+  @spec start(confi :: map(), tag :: atom()) :: :ok | {:error, atom(), term()}
   def start(%{sdk_key: sdk_key} = config, tag) do
     sdk_key
     |> String.to_charlist()
@@ -54,11 +54,11 @@ defmodule Zexbox.Flags do
       iex>
 
   """
-  @spec start(atom()) :: :ok | {:error, atom(), term()}
-  def start(name) when is_atom(name) do
+  @spec start(tag :: atom()) :: :ok | {:error, atom(), term()}
+  def start(tag) when is_atom(tag) do
     Application.fetch_env!(:zexbox, :flags)
     |> Enum.into(%{})
-    |> start(name)
+    |> start(tag)
   end
 
   @doc """
@@ -88,7 +88,7 @@ defmodule Zexbox.Flags do
       {:error, {:not_found, "my-flag"}}
 
   """
-  @spec variation(String.t(), map(), any(), atom()) :: any()
+  @spec variation(key :: String.t(), context :: map(), default :: any(), tag :: atom()) :: any()
   def variation(key, context, default, tag) do
     :ldclient.variation(key, :ldclient_context.new_from_map(context), default, tag)
   end
@@ -105,13 +105,13 @@ defmodule Zexbox.Flags do
       {:error, {:not_found, "my-flag"}}
 
   """
-  @spec variation(String.t(), map(), any()) :: any()
+  @spec variation(key :: String.t(), context :: map(), default :: any()) :: any()
   def variation(key, context_key, default), do: variation(key, context_key, default, :default)
 
   @doc """
   Stops the ldclient with the given tag.
   """
-  @spec stop(atom()) :: :ok
+  @spec stop(tag :: atom()) :: :ok
   def stop(tag) do
     :ldclient.stop_instance(tag)
   end
