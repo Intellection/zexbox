@@ -35,7 +35,7 @@ defmodule Zexbox.Flags do
       {:error, :already_started, #PID<0.602.0>}
 
   """
-  @spec start(confi :: map(), tag :: atom()) :: :ok | {:error, atom(), term()}
+  @spec start(config :: map(), tag :: atom()) :: :ok | {:error, atom(), term()}
   def start(%{sdk_key: sdk_key} = config, tag) do
     sdk_key
     |> String.to_charlist()
