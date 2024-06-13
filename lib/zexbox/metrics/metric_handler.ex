@@ -60,7 +60,7 @@ defmodule Zexbox.Metrics.MetricHandler do
   end
 
   defp referer(conn) do
-    case Enum.find(conn.req_headers, fn {key, __value} -> key == "referer" end) do
+    case Enum.find(conn.req_headers, fn {key, _value} -> key == "referer" end) do
       {_key, value} -> value
       nil -> nil
     end
