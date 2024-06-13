@@ -1,6 +1,5 @@
 defmodule Zexbox.Metrics.ControllerSeriesTest do
   use ExUnit.Case
-
   alias Zexbox.Metrics.ControllerSeries
 
   describe "tag/3" do

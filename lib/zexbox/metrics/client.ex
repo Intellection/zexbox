@@ -50,12 +50,10 @@ defmodule Zexbox.Metrics.Client do
   If there is an error while writing the metric, the function will log the error using the Logger module without crashing the process,
   """
 
-  alias Zexbox.Metrics.Connection
-  alias Zexbox.Metrics.ControllerSeries
-  alias Zexbox.Metrics.Series
+  alias Zexbox.Metrics.{Connection, ControllerSeries, Series}
   require Logger
 
-  @type series :: %ControllerSeries{} | Series.t()
+  @type series :: ControllerSeries.t() | Series.t()
 
   @doc """
   Write a metric to InfluxDB.
@@ -73,13 +71,10 @@ defmodule Zexbox.Metrics.Client do
     |> write_to_influx()
   end
 
-  def write_metric(metrics), do: write_to_influx(metrics)
+  def write_metric(metrics),
+    do: write_to_influx(metrics)
 
   defp write_to_influx(metrics) do
-    metrics
-    |> Connection.write()
-  rescue
-    error ->
-      Logger.debug("Failed to write metric to InfluxDB: #{inspect(error)}")
+    Connection.write(metrics)
   end
 end

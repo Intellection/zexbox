@@ -1,8 +1,6 @@
 defmodule Zexbox.Metrics.MetricHandlerTest do
   use ExUnit.Case
-
-  alias Zexbox.Metrics.ControllerSeries
-  alias Zexbox.Metrics.MetricHandler
+  alias Zexbox.Metrics.{ControllerSeries, MetricHandler}
 
   defmodule MockClient do
     @spec write_metric(ControllerSeries.t()) :: ControllerSeries.t()
