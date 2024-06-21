@@ -1,6 +1,8 @@
 defmodule Zexbox.Logging.LogHandler do
   @moduledoc """
-  Handles all log events. This uses the default Logger module to log events to the console.
+  Handles the default start and stop events for phoenix endpoints. This makes use of the
+  default [Logger](https://hexdocs.pm/logger/main/Logger.html) module and as such will obey the :logger configuration
+  specified in your app.
   """
   require Logger
 
