@@ -1,11 +1,11 @@
 defmodule Zexbox.Logging.LogHandler do
   @moduledoc """
-  Handles all log events.
+  Handles all log events. This uses the default Logger module to log events to the console.
   """
   require Logger
 
   @doc """
-  This function is called by the Phoenix endpoint when a controller action is started and finished.
+  This function is called by the Phoenix endpoint when a controller action is started or finished.
 
   ## Examples
 
@@ -15,16 +15,20 @@ defmodule Zexbox.Logging.LogHandler do
   """
   @spec handle_event(list(atom), map(), map(), map()) :: :ok
   def handle_event([:phoenix, :endpoint, :stop], measurements, metadata, config) do
-    Logger.log(
-      :info,
-      "LogHandler.handle_event/4 called with #{inspect(measurements)}, #{inspect(metadata)}, #{inspect(config)} on stop"
+    Logger.info(
+      event: [:phoenix, :endpoint, :stop],
+      measurements: measurements,
+      metadata: metadata,
+      config: config
     )
   end
 
   def handle_event([:phoenix, :endpoint, :start], measurements, metadata, config) do
-    Logger.log(
-      :info,
-      "LogHandler.handle_event/4 called with #{inspect(measurements)}, #{inspect(metadata)}, #{inspect(config)} on start"
+    Logger.info(
+      event: [:phoenix, :endpoint, :start],
+      measurements: measurements,
+      metadata: metadata,
+      config: config
     )
   end
 end
