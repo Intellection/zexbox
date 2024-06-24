@@ -101,13 +101,7 @@ def start(_type, _args) do
 end
 ```
 
-This sets up handlers for the `[:phoenix, :endpoint, :stop]` and `[:phoenix, :endpoint, :start]` events. The handlers are named `"phoenix_controller_logs_stop"` and `"phoenix_controller_logs_start"` and will look like the following respectively
-
-`LogHandler.handle_event/4 called with <measurements>, <inspect(metadata)>, <config> on stop`
-
-and
-
-`LogHandler.handle_event/4 called with <measurements>, <inspect(metadata)>, <config> on start`
+This sets up handlers for the `[:phoenix, :endpoint, :start]` and `[:phoenix, :endpoint, :stop]` [events](https://hexdocs.pm/phoenix/1.4.12/Phoenix.Endpoint.html#module-instrumentation) which are dispatched by `Plug.Telemetry` at the beginning and end of each request. The handlers are named `phoenix_controller_logs_stop` and `phoenix_controller_logs_start` respectively. The handlers log structured data (reports) in the following form `[info] [event: <event_params>, measurements: <measurement_data>, metadata: <metadat>, config: <config>]`.
 
 ### Adding your own logs
 
