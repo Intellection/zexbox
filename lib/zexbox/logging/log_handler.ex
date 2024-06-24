@@ -15,7 +15,7 @@ defmodule Zexbox.Logging.LogHandler do
       :ok
 
   """
-  @spec handle_event(list(atom), map(), map(), map()) :: :ok
+  @spec handle_event(list(atom()), map(), map(), map()) :: :ok
   def handle_event([:phoenix, :endpoint, :stop], measurements, metadata, config) do
     Logger.info(
       event: [:phoenix, :endpoint, :stop],
