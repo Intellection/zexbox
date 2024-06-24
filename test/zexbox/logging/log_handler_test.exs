@@ -13,7 +13,7 @@ defmodule Zexbox.Logging.LogHandlerTest do
                  %{bar: "foo"}
                )
              end) =~
-               "LogHandler.handle_event/4 called with %{foo: \"bar\"}, %{fizz: \"buzz\"}, %{bar: \"foo\"} on stop"
+               "[info] [event: [:phoenix, :endpoint, :stop], measurements: %{foo: \"bar\"}, metadata: %{fizz: \"buzz\"}, config: %{bar: \"foo\"}]"
     end
 
     test "returns :ok for start event" do
@@ -25,7 +25,7 @@ defmodule Zexbox.Logging.LogHandlerTest do
                  %{bar: "foo"}
                )
              end) =~
-               "LogHandler.handle_event/4 called with %{foo: \"bar\"}, %{fizz: \"buzz\"}, %{bar: \"foo\"} on start"
+               "[info] [event: [:phoenix, :endpoint, :start], measurements: %{foo: \"bar\"}, metadata: %{fizz: \"buzz\"}, config: %{bar: \"foo\"}]"
     end
   end
 end
