@@ -1,53 +1,47 @@
 defmodule Zexbox.Logging do
   @moduledoc """
-  This module is responsible for attaching logging to telemetry events.
+  Module for logging events in Zexbox.
   """
+
   alias Zexbox.Logging.LogHandler
+  alias Zexbox.Telemetry
 
   @doc """
-  Attaches logging to the Phoenix endpoint stop and start events.
-  By default will be attached on supervisor startup
-  """
-  @spec attach_controller_logs() :: :ok
-  def attach_controller_logs do
-    attach_telemetry(
-      "phoenix_controller_logs_stop",
-      [:phoenix, :endpoint, :stop],
-      &LogHandler.handle_event/4
-    )
+  Attaches Telemetry handlers for Phoenix controller events.
 
-    attach_telemetry(
-      "phoenix_controller_logs_start",
-      [:phoenix, :endpoint, :start],
-      &LogHandler.handle_event/4
-    )
-  end
-
-  @doc """
-  Attaches logging to the given event with the given params.
-
-  Note: The logs will only be attached if the application environment variable :capture_telemetry_log_events is set to true.
+  This function sets up handlers for the `[:phoenix, :endpoint, :stop]` and `[:phoenix, :endpoint, :start]` events.
+  The handlers are named `"phoenix_controller_logs_stop"` and `"phoenix_controller_logs_start"`,
+  both of which use the `LogHandler.handle_event/4` function to process the events.
 
   ## Examples
 
-      iex> Zexbox.Logging.attach_telemetry(:my_event, [:my, :event], &MyAppHandler.my_handler/3)
+      iex> Logging.attach_controller_logs()
       :ok
+      iex> Logging.attach_controller_logs()
+      ** (RuntimeError) event already exists
 
   """
-  @spec attach_telemetry(
-          event_name :: binary(),
-          event_params :: list(atom()),
-          callback :: (any(), any(), any(), any() -> any())
-        ) :: :ok
-  def attach_telemetry(event, params, function) do
-    if Zexbox.Config.capture_telemetry_log_events?() do
-      :ok =
-        :telemetry.attach(
-          event,
-          params,
-          function,
-          nil
-        )
+  @spec attach_controller_logs!() :: :ok
+  def attach_controller_logs! do
+    stop_result =
+      Telemetry.attach(
+        "phoenix_controller_logs_stop",
+        [:phoenix, :endpoint, :stop],
+        &LogHandler.handle_event/4,
+        nil
+      )
+
+    start_result =
+      Telemetry.attach(
+        "phoenix_controller_logs_start",
+        [:phoenix, :endpoint, :start],
+        &LogHandler.handle_event/4,
+        nil
+      )
+
+    case {stop_result, start_result} do
+      {:ok, :ok} -> :ok
+      _error -> raise "Phoenix controller logs already attached"
     end
   end
 end

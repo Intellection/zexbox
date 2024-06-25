@@ -1,6 +1,5 @@
 defmodule Zexbox.Metrics.SeriesTest do
   use ExUnit.Case
-
   alias Zexbox.Metrics.Series
 
   test "creates a default struct with correct defaults" do

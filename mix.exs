@@ -15,13 +15,8 @@ defmodule Zexbox.MixProject do
       source_url: "https://github.com/Intellection/zexbox",
       test_coverage: [
         ignore_modules: [
-          Zexbox.Metrics,
-          Zexbox.Metrics.MetricHandler,
-          Zexbox.Metrics.Connection,
-          Zexbox.Application,
           Mix.Tasks.Bump,
-          Zexbox.Metrics.Client,
-          Zexbox.Flags
+          Zexbox.Metrics.Connection
         ]
       ]
     ]
@@ -38,14 +33,15 @@ defmodule Zexbox.MixProject do
   defp deps do
     [
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
-      {:ldclient, "~> 3.0.0", hex: :launchdarkly_server_sdk},
-      {:instream, "~> 2.2"},
-      {:telemetry, "~> 1.2.1"},
-      {:ex_doc, "~> 0.16", only: :dev, runtime: false},
       {:dialyxir, "~> 1.3", only: [:dev, :test], runtime: false},
-      {:mix_audit, "~> 2.0", only: [:dev, :test], runtime: false},
       {:doctor, "~> 0.21.0", only: [:dev, :test]},
-      {:sobelow, "~> 0.8", only: [:dev, :test]}
+      {:ex_doc, "~> 0.16", only: :dev, runtime: false},
+      {:instream, "~> 2.2"},
+      {:ldclient, "~> 3.0.0", hex: :launchdarkly_server_sdk},
+      {:mix_audit, "~> 2.0", only: [:dev, :test], runtime: false},
+      {:mock, "~> 0.3.0", only: :test},
+      {:sobelow, "~> 0.8", only: [:dev, :test]},
+      {:telemetry, "~> 1.2.1"}
     ]
   end
 

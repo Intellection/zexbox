@@ -1,70 +1,62 @@
 defmodule Zexbox.Metrics do
   @moduledoc """
-  A module for handling and standardising metrics in Zexbox applications.
-
-  If you want to attach metrics to other events, you can use `Zexbox.Metrics.attach_telemetry/3`:
-
-  ## Examples
+  This module is esponsible for setting up and supervising the metrics collection and telemetry.
+  It attaches telemetry handlers for capturing metrics related to your Phoenix endpoints.
 
   ```elixir
-  def start(_type, _args) do
-    Zexbox.Metrics.attach_telemetry(:my_event, [:my, :params], &my_handler/1)
+  def start(_type, args) do
+    children = [{Zexbox.Metrics, []}]
+    Supervisor.start_link(children, opts)
   end
   ```
-
-  ## Public API
-
-  The following functions are provided by this module:
-
-  - `attach_controller_metrics/0`: Attaches metrics to the Phoenix endpoint stop event.
-  - `attach_telemetry/3`: Attaches metrics to the given event with the given params.
   """
 
+  use Supervisor
   alias Zexbox.Metrics.MetricHandler
+  alias Zexbox.Telemetry
 
   @doc """
-  Attaches metrics to the Phoenix endpoint stop event.
+  Initializes the supervisor with the required child processes.
 
   ## Examples
 
-      iex> Zexbox.Metrics.attach_controller_metrics()
-      :ok
-
+      iex> Zexbox.Metrics.init(nil)
+      {:ok,
+       {%{intensity: 3, period: 5, strategy: :one_for_one, auto_shutdown: :never},
+        [
+          %{
+            id: Zexbox.Metrics.Connection,
+            start: {Instream.Connection.Supervisor, :start_link, [Zexbox.Metrics.Connection]}
+          }
+        ]}}
   """
-  @spec attach_controller_metrics() :: :ok
-  def attach_controller_metrics do
-    attach_telemetry(
-      "phoenix_controller_metrics",
-      [:phoenix, :endpoint, :stop],
-      &MetricHandler.handle_event/4
-    )
+  @impl Supervisor
+  def init(_args) do
+    children = [Zexbox.Metrics.Connection]
+    Supervisor.init(children, strategy: :one_for_one)
   end
 
   @doc """
-  Attaches metrics to the given event with the given params.
-
-  Note: The metrics will only be attached if the application environment variable :capture_telemetry_events is set to true.
+  Starts the metrics supervisor and attaches the controller metrics.
 
   ## Examples
 
-      iex> Zexbox.Metrics.attach_telemetry(:my_event, [:my, :event], &MyAppHandler.my_handler/3)
-      :ok
+        iex> Zexbox.Metrics.start_link(nil)
+        {:ok, #PID<0.123.0>}
 
   """
-  @spec attach_telemetry(
-          event_name :: binary(),
-          event_params :: [atom() | :stop],
-          callback :: (any(), any(), any(), any() -> any())
-        ) :: :ok
-  def attach_telemetry(event, params, function) do
-    if Zexbox.Config.capture_telemetry_metric_events?() do
-      :ok =
-        :telemetry.attach(
-          event,
-          params,
-          function,
-          nil
-        )
-    end
+  @spec start_link(args :: any()) :: Supervisor.on_start()
+  def start_link(_args) do
+    attach_controller_metrics()
+    Supervisor.start_link(__MODULE__, nil, name: __MODULE__)
+  end
+
+  defp attach_controller_metrics do
+    Telemetry.attach(
+      "phoenix_controller_metrics",
+      [:phoenix, :endpoint, :stop],
+      &MetricHandler.handle_event/4,
+      nil
+    )
   end
 end

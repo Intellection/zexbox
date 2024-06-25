@@ -24,24 +24,6 @@ defmodule Zexbox.Flags do
   """
 
   @doc """
-  Starts the LaunchDarkly client using the `:flags` application config and the `:default` tag.
-
-  ## Examples
-
-      iex> Zexbox.Flags.start()
-      :ok
-      iex> Zexbox.Flags.start()
-      {:error, :already_started, #PID<0.602.0>}
-
-  """
-  @spec start() :: :ok | {:error, atom(), term()}
-  def start do
-    Application.fetch_env!(:zexbox, :flags)
-    |> Enum.into(%{})
-    |> start(:default)
-  end
-
-  @doc """
   Starts the LaunchDarkly client with the given config and tag.
 
   ## Examples
@@ -53,7 +35,7 @@ defmodule Zexbox.Flags do
       {:error, :already_started, #PID<0.602.0>}
 
   """
-  @spec start(map(), atom()) :: :ok | {:error, atom(), term()}
+  @spec start(config :: map(), tag :: atom()) :: :ok | {:error, atom(), term()}
   def start(%{sdk_key: sdk_key} = config, tag) do
     sdk_key
     |> String.to_charlist()
@@ -61,19 +43,37 @@ defmodule Zexbox.Flags do
   end
 
   @doc """
-  Starts the LaunchDarkly client with the given config and the `:default` tag.
+  Starts the LaunchDarkly client with the given config or the given tag.
 
   ## Examples
 
       iex> Zexbox.Flags.start(%{sdk_key: "my-sdk-key"})
       :ok
-
       iex> Zexbox.Flags.start(%{sdk_key: "my-sdk-key"})
+      {:error, :already_started, #PID<0.602.0>}
+      iex>
+
+  """
+  @spec start(tag :: atom()) :: :ok | {:error, atom(), term()}
+  def start(tag) when is_atom(tag) do
+    Application.fetch_env!(:zexbox, :flags)
+    |> Enum.into(%{})
+    |> start(tag)
+  end
+
+  @doc """
+  Starts the LaunchDarkly client using the `:flags` application config and the `:default` tag.
+
+  ## Examples
+
+      iex> Zexbox.Flags.start()
+      :ok
+      iex> Zexbox.Flags.start()
       {:error, :already_started, #PID<0.602.0>}
 
   """
-  @spec start(map()) :: :ok | {:error, atom(), any()}
-  def start(config), do: start(config, :default)
+  @spec start() :: :ok | {:error, atom(), term()}
+  def start, do: start(:default)
 
   @doc """
   Gets the variation of a flag for the given key, context, default value, and tag.
@@ -87,7 +87,7 @@ defmodule Zexbox.Flags do
       {:error, {:not_found, "my-flag"}}
 
   """
-  @spec variation(String.t(), map(), any(), atom()) :: any()
+  @spec variation(key :: String.t(), context :: map(), default :: any(), tag :: atom()) :: any()
   def variation(key, context, default, tag) do
     :ldclient.variation(key, :ldclient_context.new_from_map(context), default, tag)
   end
@@ -104,13 +104,13 @@ defmodule Zexbox.Flags do
       {:error, {:not_found, "my-flag"}}
 
   """
-  @spec variation(String.t(), map(), any()) :: any()
+  @spec variation(key :: String.t(), context :: map(), default :: any()) :: any()
   def variation(key, context_key, default), do: variation(key, context_key, default, :default)
 
   @doc """
   Stops the ldclient with the given tag.
   """
-  @spec stop(atom()) :: :ok
+  @spec stop(tag :: atom()) :: :ok
   def stop(tag) do
     :ldclient.stop_instance(tag)
   end
