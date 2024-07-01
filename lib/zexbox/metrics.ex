@@ -47,8 +47,9 @@ defmodule Zexbox.Metrics do
   """
   @spec start_link(args :: any()) :: Supervisor.on_start()
   def start_link(_args) do
+    on_start = Supervisor.start_link(__MODULE__, nil, name: __MODULE__)
     attach_controller_metrics()
-    Supervisor.start_link(__MODULE__, nil, name: __MODULE__)
+    on_start
   end
 
   defp attach_controller_metrics do
