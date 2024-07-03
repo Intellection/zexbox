@@ -21,23 +21,42 @@ defmodule Zexbox.Metrics.MetricHandler do
 
     %ControllerSeries{}
     |> ControllerSeries.tag(:method, metadata.conn.method)
-    |> ControllerSeries.tag(
-      :action,
-      Atom.to_string(Map.get(metadata.conn.private, :phoenix_action, nil))
-    )
-    |> ControllerSeries.tag(:format, metadata.conn.private.phoenix_format)
+    |> ControllerSeries.tag(:action, action(metadata))
+    |> ControllerSeries.tag(:format, format(metadata))
     |> ControllerSeries.tag(:status, status)
-    |> ControllerSeries.tag(
-      :controller,
-      Atom.to_string(metadata.conn.private.phoenix_controller)
-    )
+    |> ControllerSeries.tag(:controller, controller(metadata))
     |> ControllerSeries.field(:count, 1)
-    |> ControllerSeries.field(:trace_id, "empty_for_now")
+    |> ControllerSeries.field(:trace_id, trace_id(metadata))
     |> ControllerSeries.field(:success, success?(status))
     |> ControllerSeries.field(:path, metadata.conn.request_path)
     |> ControllerSeries.field(:http_referer, referer(metadata.conn))
     |> ControllerSeries.field(:duration_ms, duration(measurements))
     |> write_metric(config)
+  rescue
+    exception ->
+      Logger.debug("Exception creating controller series: #{inspect(exception)}")
+  end
+
+  defp action(metadata) do
+    case metadata.conn[:private][:phoenix_action] do
+      nil -> nil
+      action -> Atom.to_string(action)
+    end
+  end
+
+  defp format(metadata) do
+    metadata.conn[:private][:phoenix_format]
+  end
+
+  defp controller(metadata) do
+    case metadata.conn[:private][:phoenix_controller] do
+      nil -> nil
+      controller -> Atom.to_string(controller)
+    end
+  end
+
+  defp trace_id(metadata) do
+    metadata.conn.assigns[:trace_id]
   end
 
   defp write_metric(metric, %{metric_client: client}) do

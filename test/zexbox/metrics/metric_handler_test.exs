@@ -21,6 +21,9 @@ defmodule Zexbox.Metrics.MetricHandlerTest do
           phoenix_format: "html",
           phoenix_controller: :page_controller
         },
+        assigns: %{
+          trace_id: "trace_id"
+        },
         request_path: "/",
         req_headers: [{"referer", "https://www.google.com"}]
       }
@@ -31,7 +34,7 @@ defmodule Zexbox.Metrics.MetricHandlerTest do
     expected = %ControllerSeries{
       fields: %Zexbox.Metrics.ControllerSeries.Fields{
         count: 1,
-        trace_id: "empty_for_now",
+        trace_id: "trace_id",
         duration_ms: 1000,
         http_referer: "https://www.google.com",
         path: "/",
