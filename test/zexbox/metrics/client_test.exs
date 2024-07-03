@@ -28,9 +28,9 @@ defmodule Zexbox.Metrics.ClientTest do
 
     test_with_mock "logs any errors that might occur while writing metrics", Connection,
       write: fn _metrics -> raise "Bork" end do
-      capture_log(fn ->
-        assert {:error, "Bork"} = Client.write_metric(@map)
-      end) =~ "Failed to write metric to InfluxDB: Bork"
+      assert capture_log(fn ->
+               assert {:error, "Bork"} = Client.write_metric(@map)
+             end) =~ "Failed to write metric to InfluxDB: %RuntimeError{message: \"Bork\"}"
     end
   end
 end
