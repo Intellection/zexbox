@@ -9,7 +9,7 @@ defmodule Zexbox.MetricsTest do
 
   test "init/1 initializes the metrics supervisor" do
     assert {:ok,
-            {%{intensity: 3, period: 5, strategy: :one_for_one, auto_shutdown: :never},
+            {%{intensity: 3, period: 5, strategy: :one_for_one},
              [
                %{
                  id: Zexbox.Metrics.Connection,

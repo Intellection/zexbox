@@ -17,31 +17,30 @@ defmodule Zexbox.Metrics.MetricHandler do
   """
   @spec handle_event(list(atom()), map(), map(), map()) :: any()
   def handle_event([:phoenix, :endpoint, :stop], measurements, metadata, config) do
-    case required_fields_present?(metadata) do
-      true ->
+    case required_fields_missing?(metadata) do
+      false ->
         measurements
         |> create_controller_series(metadata)
         |> write_metric(config)
 
-      false ->
-        Logger.debug("Required fields not present in metadata")
+      true ->
+        Logger.info("Required fields not present in metadata")
         nil
     end
   rescue
     exception ->
-      Logger.debug("Exception creating controller series: #{inspect(exception)}")
+      Logger.info("Exception creating controller series: #{inspect(exception)}")
   end
 
-  defp required_fields_present?(%{conn: %{private: private}}) do
-    action = private[:phoenix_action]
+  defp required_fields_missing?(%{conn: %{private: private}}) do
     format = private[:phoenix_format]
     controller = private[:phoenix_controller]
 
-    !(is_nil(action) || is_nil(format) || is_nil(controller))
+    is_nil(format) || is_nil(controller)
   end
 
-  defp required_fields_present?(_metadata) do
-    false
+  defp required_fields_missing?(_metadata) do
+    true
   end
 
   defp create_controller_series(measurements, metadata) do
@@ -50,9 +49,12 @@ defmodule Zexbox.Metrics.MetricHandler do
     %ControllerSeries{}
     |> ControllerSeries.tag(:method, metadata.conn.method)
     |> ControllerSeries.tag(:status, status)
-    |> ControllerSeries.tag(:action, Atom.to_string(metadata.conn.private.phoenix_action))
-    |> ControllerSeries.tag(:format, metadata.conn.private.phoenix_format)
-    |> ControllerSeries.tag(:controller, Atom.to_string(metadata.conn.private.phoenix_controller))
+    |> ControllerSeries.tag(:action, Atom.to_string(metadata.conn[:private][:phoenix_action]))
+    |> ControllerSeries.tag(:format, metadata.conn[:private][:phoenix_format])
+    |> ControllerSeries.tag(
+      :controller,
+      Atom.to_string(metadata.conn[:private][:phoenix_controller])
+    )
     |> ControllerSeries.field(:count, 1)
     |> ControllerSeries.field(:success, success?(status))
     |> ControllerSeries.field(:path, metadata.conn.request_path)
