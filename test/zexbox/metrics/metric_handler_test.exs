@@ -45,7 +45,7 @@ defmodule Zexbox.Metrics.MetricHandlerTest do
       config: config
     } do
       assert %ControllerSeries{
-               fields: %Zexbox.Metrics.ControllerSeries.Fields{
+               fields: %ControllerSeries.Fields{
                  count: 1,
                  trace_id: "trace_id",
                  duration_ms: 1000,
@@ -54,13 +54,55 @@ defmodule Zexbox.Metrics.MetricHandlerTest do
                  request_id: nil,
                  success: 1.0
                },
-               tags: %Zexbox.Metrics.ControllerSeries.Tags{
+               tags: %ControllerSeries.Tags{
                  action: "index",
                  controller: "page_controller",
                  format: "html",
                  method: "GET",
                  status: 200
                }
+             } ==
+               MetricHandler.handle_event(
+                 event,
+                 measurements,
+                 metadata,
+                 config
+               )
+    end
+
+    test "conditionally adds tags and fields based on their presence", %{
+      event: event,
+      measurements: measurements,
+      config: config
+    } do
+      metadata = %{
+        conn: %{
+          status: 200,
+          method: "GET",
+          private: %{},
+          request_path: "/",
+          req_headers: []
+        }
+      }
+
+      assert %ControllerSeries{
+               fields: %ControllerSeries.Fields{
+                 count: 1,
+                 duration_ms: 1000,
+                 http_referer: nil,
+                 path: "/",
+                 request_id: nil,
+                 success: 1.0,
+                 trace_id: nil
+               },
+               tags: %ControllerSeries.Tags{
+                 action: nil,
+                 controller: nil,
+                 format: nil,
+                 method: "GET",
+                 status: 200
+               },
+               timestamp: nil
              } ==
                MetricHandler.handle_event(
                  event,
