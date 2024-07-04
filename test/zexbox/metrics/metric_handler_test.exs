@@ -70,7 +70,7 @@ defmodule Zexbox.Metrics.MetricHandlerTest do
                )
     end
 
-    test "conditionally adds tags and fields based on their presence", %{
+    test "does not write the metric if the phoenix_ values are missing from conn.private ", %{
       event: event,
       measurements: measurements,
       config: config
@@ -85,36 +85,17 @@ defmodule Zexbox.Metrics.MetricHandlerTest do
         }
       }
 
-      assert %ControllerSeries{
-               fields: %ControllerSeries.Fields{
-                 count: 1,
-                 duration_ms: 1000,
-                 http_referer: nil,
-                 path: "/",
-                 request_id: nil,
-                 success: 1.0,
-                 trace_id: nil
-               },
-               tags: %ControllerSeries.Tags{
-                 action: nil,
-                 controller: nil,
-                 format: nil,
-                 method: "GET",
-                 status: 200
-               },
-               timestamp: nil
-             } ==
-               MetricHandler.handle_event(
-                 event,
-                 measurements,
-                 metadata,
-                 config
-               )
+      assert MetricHandler.handle_event(
+               event,
+               measurements,
+               metadata,
+               config
+             ) == nil
     end
 
-    test "captures and logs any exceptions", %{event: event} do
+    test "captures and logs any exceptions", %{event: event, metadata: metadata} do
       assert capture_log(fn ->
-               MetricHandler.handle_event(event, nil, nil, nil)
+               MetricHandler.handle_event(event, nil, metadata, nil)
              end) =~
                "Exception creating controller series: %KeyError"
     end

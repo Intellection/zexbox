@@ -15,56 +15,50 @@ defmodule Zexbox.Metrics.MetricHandler do
       :ok
 
   """
-  @spec handle_event(list(atom), map, map, map) :: any()
+  @spec handle_event(list(atom()), map(), map(), map()) :: any()
   def handle_event([:phoenix, :endpoint, :stop], measurements, metadata, config) do
+    case required_fields_present?(metadata) do
+      true ->
+        measurements
+        |> create_controller_series(metadata)
+        |> write_metric(config)
+
+      false ->
+        Logger.debug("Required fields not present in metadata")
+        nil
+    end
+  rescue
+    exception ->
+      Logger.debug("Exception creating controller series: #{inspect(exception)}")
+  end
+
+  defp required_fields_present?(%{conn: %{private: private}}) do
+    action = private[:phoenix_action]
+    format = private[:phoenix_format]
+    controller = private[:phoenix_controller]
+
+    !(is_nil(action) || is_nil(format) || is_nil(controller))
+  end
+
+  defp required_fields_present?(_metadata) do
+    false
+  end
+
+  defp create_controller_series(measurements, metadata) do
     status = metadata.conn.status
 
     %ControllerSeries{}
     |> ControllerSeries.tag(:method, metadata.conn.method)
     |> ControllerSeries.tag(:status, status)
-    |> set_action_tag(metadata)
-    |> set_format_tag(metadata)
-    |> set_controller_tag(metadata)
+    |> ControllerSeries.tag(:action, Atom.to_string(metadata.conn.private.phoenix_action))
+    |> ControllerSeries.tag(:format, metadata.conn.private.phoenix_format)
+    |> ControllerSeries.tag(:controller, Atom.to_string(metadata.conn.private.phoenix_controller))
     |> ControllerSeries.field(:count, 1)
     |> ControllerSeries.field(:success, success?(status))
     |> ControllerSeries.field(:path, metadata.conn.request_path)
     |> ControllerSeries.field(:duration_ms, duration(measurements))
     |> set_referer_field(metadata)
     |> set_trace_id_field(metadata)
-    |> write_metric(config)
-  rescue
-    exception ->
-      Logger.debug("Exception creating controller series: #{inspect(exception)}")
-  end
-
-  defp set_action_tag(series, metadata) do
-    case metadata.conn[:private][:phoenix_action] do
-      nil ->
-        series
-
-      action ->
-        ControllerSeries.tag(series, :action, Atom.to_string(action))
-    end
-  end
-
-  defp set_format_tag(series, metadata) do
-    case metadata.conn[:private][:phoenix_format] do
-      nil ->
-        series
-
-      format ->
-        ControllerSeries.tag(series, :format, format)
-    end
-  end
-
-  defp set_controller_tag(series, metadata) do
-    case metadata.conn[:private][:phoenix_controller] do
-      nil ->
-        series
-
-      controller ->
-        ControllerSeries.tag(series, :controller, Atom.to_string(controller))
-    end
   end
 
   defp set_trace_id_field(series, metadata) do
