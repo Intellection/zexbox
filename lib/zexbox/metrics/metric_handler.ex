@@ -19,8 +19,6 @@ defmodule Zexbox.Metrics.MetricHandler do
   def handle_event([:phoenix, :endpoint, :stop], measurements, metadata, config) do
     case required_fields_missing?(metadata) do
       false ->
-        Logger.info("Creating controller series")
-
         measurements
         |> create_controller_series(metadata)
         |> write_metric(config)
