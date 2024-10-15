@@ -71,13 +71,19 @@ defmodule Zexbox.Metrics.MetricHandler do
   end
 
   defp set_trace_id_field(series, metadata) do
-    case metadata.conn[:assigns][:trace_id] do
+    case trace_id(metadata) do
       nil ->
         series
 
       trace_id ->
         ControllerSeries.field(series, :trace_id, trace_id)
     end
+  end
+
+  defp trace_id(metadata) do
+    metadata.conn
+    |> Map.get(:assigns, %{})
+    |> Map.get(:trace_id)
   end
 
   defp set_referer_field(series, metadata) do
