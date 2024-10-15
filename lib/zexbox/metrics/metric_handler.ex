@@ -29,6 +29,7 @@ defmodule Zexbox.Metrics.MetricHandler do
     end
   rescue
     exception ->
+      Logger.error("Exception creating controller series: #{inspect(exception)}")
   end
 
   defp required_fields_missing?(%{conn: %{private: private}}) do
