@@ -29,12 +29,11 @@ defmodule Zexbox.Metrics.MetricHandler do
     end
   rescue
     exception ->
-      Logger.info("Exception creating controller series: #{inspect(exception)}")
   end
 
   defp required_fields_missing?(%{conn: %{private: private}}) do
-    format = private[:phoenix_format]
-    controller = private[:phoenix_controller]
+    format = Map.get(private, :phoenix_format)
+    controller = Map.get(private, :phoenix_controller)
 
     is_nil(format) || is_nil(controller)
   end
@@ -46,15 +45,20 @@ defmodule Zexbox.Metrics.MetricHandler do
   defp create_controller_series(measurements, metadata) do
     status = metadata.conn.status
 
+    action =
+      metadata.conn.private
+      |> Map.get(:phoenix_action)
+      |> Atom.to_string()
+
+    controller =
+      Atom.to_string(metadata.conn.private.phoenix_controller)
+
     %ControllerSeries{}
     |> ControllerSeries.tag(:method, metadata.conn.method)
     |> ControllerSeries.tag(:status, status)
-    |> ControllerSeries.tag(:action, Atom.to_string(metadata.conn[:private][:phoenix_action]))
-    |> ControllerSeries.tag(:format, metadata.conn[:private][:phoenix_format])
-    |> ControllerSeries.tag(
-      :controller,
-      Atom.to_string(metadata.conn[:private][:phoenix_controller])
-    )
+    |> ControllerSeries.tag(:action, action)
+    |> ControllerSeries.tag(:format, metadata.conn.private.phoenix_format)
+    |> ControllerSeries.tag(:controller, controller)
     |> ControllerSeries.field(:count, 1)
     |> ControllerSeries.field(:success, success?(status))
     |> ControllerSeries.field(:path, metadata.conn.request_path)
