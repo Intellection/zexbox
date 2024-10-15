@@ -75,6 +75,7 @@ defmodule Zexbox.Metrics.Client do
     do: write_to_influx(metrics)
 
   defp write_to_influx(metrics) do
+    Logger.info("WRITING METRIC: #{inspect(metrics)}")
     Connection.write(metrics)
   rescue
     error ->
