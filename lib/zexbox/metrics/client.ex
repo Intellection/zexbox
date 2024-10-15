@@ -79,6 +79,6 @@ defmodule Zexbox.Metrics.Client do
   rescue
     error ->
       Logger.debug("Failed to write metric to InfluxDB: #{inspect(error)}")
-      {:error, error.message}
+      {:error, inspect(error)}
   end
 end
