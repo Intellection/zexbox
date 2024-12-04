@@ -32,10 +32,10 @@ defmodule Zexbox.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.3", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.7.10", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4.5", only: [:dev, :test], runtime: false},
       {:doctor, "~> 0.22.0", only: [:dev, :test]},
-      {:ex_doc, "~> 0.16", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.35.1", only: :dev, runtime: false},
       {:instream, "~> 2.2"},
       {:ldclient, "~> 3.0.0", hex: :launchdarkly_server_sdk},
       {:mix_audit, "~> 2.0", only: [:dev, :test], runtime: false},
