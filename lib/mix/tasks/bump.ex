@@ -42,8 +42,8 @@ defmodule Mix.Tasks.Bump do
     current_branch = System.cmd("git", ["branch", "--show-current"])
 
     case current_branch do
-      {"master\n", _} -> {:ok, current_branch}
-      {_, _} -> raise "Not on master branch"
+      {"master\n", _other} -> {:ok, current_branch}
+      {_branch, _other} -> raise "Not on master branch"
     end
   end
 
@@ -76,9 +76,9 @@ defmodule Mix.Tasks.Bump do
     system_result = System.cmd("sh", ["-c", command])
 
     case system_result do
-      {_, 0} -> :ok
-      {0, _} -> :ok
-      {_, _} -> raise "Command failed: #{command}"
+      {_result, 0} -> :ok
+      {0, _status} -> :ok
+      {_result, _status} -> raise "Command failed: #{command}"
     end
   end
 
