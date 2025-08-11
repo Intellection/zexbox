@@ -9,7 +9,7 @@
 ```elixir
 def deps do
   [
-    {:zexbox, "~> 1.4.0"}
+    {:zexbox, "~> 1.4.1"}
   ]
 end
 ```
