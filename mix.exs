@@ -37,7 +37,7 @@ defmodule Zexbox.MixProject do
       {:doctor, "~> 0.22.0", only: [:dev, :test]},
       {:ex_doc, "~> 0.35.1", only: :dev, runtime: false},
       {:instream, "~> 2.2"},
-      {:ldclient, "~> 3.0.0", hex: :launchdarkly_server_sdk},
+      {:ldclient, "~> 3.8.0", hex: :launchdarkly_server_sdk},
       {:mix_audit, "~> 2.0", only: [:dev, :test], runtime: false},
       {:mock, "~> 0.3.0", only: :test},
       {:sobelow, "~> 0.8", only: [:dev, :test]},
