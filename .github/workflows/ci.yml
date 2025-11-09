@@ -78,7 +78,7 @@ jobs:
         run: mix sobelow --exit --threshold medium
 
   publish:
-    name: Publish
+    name: Publish (Dry Run)
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -90,5 +90,7 @@ jobs:
         run: mix deps.get
       - name: Compile
         run: mix compile
-      - name: Publish package (Dry Run)
-        run: mix hex.publish --dry-run --replace --yes
+      - name: Publish package
+        env:
+          HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
+        run: mix hex.publish --organization ${{ vars.HEX_ORG }} --dry-run --replace --yes
