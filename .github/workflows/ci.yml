@@ -1,9 +1,9 @@
 name: Test
 on:
   push:
-    branches: [main]
+    branches: [main,master]
   pull_request:
-    branches: [main]
+    branches: [main,master]
 jobs:
   test:
     name: Test (Elixir ${{ matrix.elixir }} | OTP ${{ matrix.otp }})
