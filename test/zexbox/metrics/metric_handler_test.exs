@@ -100,10 +100,11 @@ defmodule Zexbox.Metrics.MetricHandlerTest do
     end
 
     test "captures and logs any exceptions", %{event: event, metadata: metadata} do
-      log = capture_log(fn ->
-        MetricHandler.handle_event(event, nil, metadata, nil)
-      end)
-      
+      log =
+        capture_log(fn ->
+          MetricHandler.handle_event(event, nil, metadata, nil)
+        end)
+
       assert log =~ "Exception creating controller series:"
     end
 

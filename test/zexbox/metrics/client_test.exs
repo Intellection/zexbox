@@ -38,8 +38,8 @@ defmodule Zexbox.Metrics.ClientTest do
              end) =~ "Failed to write metric to InfluxDB: %RuntimeError{message: \"Bork\"}"
     end
 
-    test_with_mock "skips writing and returns {:ok, metrics} when metrics disabled for process", Connection,
-      write: fn _metrics -> raise "should not be called" end do
+    test_with_mock "skips writing and returns {:ok, metrics} when metrics disabled for process",
+                   Connection, write: fn _metrics -> raise "should not be called" end do
       Zexbox.Metrics.disable_for_process()
       assert {:ok, @map} = Client.write_metric(@map)
       Zexbox.Metrics.enable_for_process()
@@ -48,10 +48,12 @@ defmodule Zexbox.Metrics.ClientTest do
     test_with_mock "skips writing from task when parent process disabled metrics", Connection,
       write: fn _metrics -> raise "should not be called" end do
       Zexbox.Metrics.disable_for_process()
+
       task =
         Task.async(fn ->
           Client.write_metric(@map)
         end)
+
       assert {:ok, @map} = Task.await(task)
       Zexbox.Metrics.enable_for_process()
     end

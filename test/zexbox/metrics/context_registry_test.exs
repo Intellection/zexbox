@@ -67,4 +67,3 @@ defmodule Zexbox.Metrics.ContextRegistryTest do
     end
   end
 end
-

@@ -42,4 +42,3 @@ defmodule Zexbox.Metrics.ContextTest do
     end
   end
 end
-

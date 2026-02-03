@@ -37,6 +37,7 @@ defmodule Zexbox.Metrics do
       Zexbox.Metrics.ContextRegistry,
       Zexbox.Metrics.Connection
     ]
+
     Supervisor.init(children, strategy: :one_for_one)
   end
 
