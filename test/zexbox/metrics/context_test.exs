@@ -3,12 +3,11 @@ defmodule Zexbox.Metrics.ContextTest do
 
   alias Zexbox.Metrics.{Context, ContextRegistry}
 
-  setup_all do
-    ensure_registry_started()
-    :ok
-  end
-
   describe "disable_for_process/0 and enable_for_process/0" do
+    setup do
+      ensure_registry_started()
+      :ok
+    end
     test "toggles disabled? for the current process" do
       assert Context.disabled?() == false
 
