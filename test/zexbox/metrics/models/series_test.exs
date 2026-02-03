@@ -35,7 +35,7 @@ defmodule Zexbox.Metrics.SeriesTest do
     metric = Series.new(measurement)
 
     assert metric.measurement == measurement
-    refute is_nil(metric.timestamp)
+    assert %DateTime{} = metric.timestamp
   end
 
   test "field/3" do
