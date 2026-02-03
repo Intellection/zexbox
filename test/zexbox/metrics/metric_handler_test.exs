@@ -1,7 +1,13 @@
 defmodule Zexbox.Metrics.MetricHandlerTest do
   use ExUnit.Case
   import ExUnit.CaptureLog
-  alias Zexbox.Metrics.{ControllerSeries, MetricHandler}
+  import Mock
+  alias Zexbox.Metrics.{Connection, ControllerSeries, MetricHandler}
+
+  setup_all do
+    ensure_registry_started()
+    :ok
+  end
 
   defmodule MockClient do
     @spec write_metric(ControllerSeries.t()) :: ControllerSeries.t()
@@ -98,6 +104,26 @@ defmodule Zexbox.Metrics.MetricHandlerTest do
                MetricHandler.handle_event(event, nil, metadata, nil)
              end) =~
                "Exception creating controller series: %KeyError"
+    end
+
+    test "does not call Connection.write when process has disabled metrics", %{
+      event: event,
+      measurements: measurements,
+      metadata: metadata
+    } do
+      with_mock Connection, write: fn _metrics -> raise "should not be called" end do
+        Zexbox.Metrics.disable_for_process()
+        result = MetricHandler.handle_event(event, measurements, metadata, nil)
+        Zexbox.Metrics.enable_for_process()
+        assert {:ok, %ControllerSeries{}} = result
+      end
+    end
+  end
+
+  defp ensure_registry_started do
+    case Process.whereis(Zexbox.Metrics.ContextRegistry) do
+      nil -> {:ok, _pid} = Zexbox.Metrics.ContextRegistry.start_link()
+      _pid -> :ok
     end
   end
 end
