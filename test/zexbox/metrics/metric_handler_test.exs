@@ -5,11 +5,6 @@ defmodule Zexbox.Metrics.MetricHandlerTest do
   alias Zexbox.Metrics.{Connection, ControllerSeries, MetricHandler}
   alias Zexbox.Metrics.ContextRegistry
 
-  setup_all do
-    ensure_registry_started()
-    :ok
-  end
-
   defmodule MockClient do
     @spec write_metric(ControllerSeries.t()) :: ControllerSeries.t()
     def write_metric(metric) do
@@ -19,6 +14,8 @@ defmodule Zexbox.Metrics.MetricHandlerTest do
 
   describe "handle_event/4" do
     setup do
+      start_supervised!(ContextRegistry)
+
       event = [:phoenix, :endpoint, :stop]
 
       measurements = %{duration: 1_000_000_000}
@@ -120,13 +117,6 @@ defmodule Zexbox.Metrics.MetricHandlerTest do
         Zexbox.Metrics.enable_for_process()
         assert {:ok, %ControllerSeries{}} = result
       end
-    end
-  end
-
-  defp ensure_registry_started do
-    case Process.whereis(ContextRegistry) do
-      nil -> {:ok, _pid} = ContextRegistry.start_link()
-      _pid -> :ok
     end
   end
 end

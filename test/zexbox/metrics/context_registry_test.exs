@@ -3,12 +3,13 @@ defmodule Zexbox.Metrics.ContextRegistryTest do
 
   alias Zexbox.Metrics.ContextRegistry
 
-  setup_all do
-    ensure_registry_started()
-    :ok
-  end
-
   describe "register/1, unregister/1, disabled?/1" do
+    setup do
+      # Start a supervised ContextRegistry for each test
+      # This ensures a clean state and proper cleanup
+      start_supervised!(ContextRegistry)
+      :ok
+    end
     test "registers and unregisters a pid" do
       pid = self()
 
@@ -57,13 +58,6 @@ defmodule Zexbox.Metrics.ContextRegistryTest do
     else
       Process.sleep(5)
       eventually(predicate, attempts - 1)
-    end
-  end
-
-  defp ensure_registry_started do
-    case Process.whereis(ContextRegistry) do
-      nil -> {:ok, _pid} = ContextRegistry.start_link()
-      _pid -> :ok
     end
   end
 end

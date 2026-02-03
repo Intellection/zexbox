@@ -5,11 +5,6 @@ defmodule Zexbox.Metrics.ClientTest do
   alias Zexbox.Metrics.{Client, Connection, Series}
   alias Zexbox.Metrics.ContextRegistry
 
-  setup_all do
-    ensure_registry_started()
-    :ok
-  end
-
   @map %{
     measurement: "my_measurement",
     fields: %{
@@ -21,6 +16,11 @@ defmodule Zexbox.Metrics.ClientTest do
   }
 
   describe "write_metric/1" do
+    setup do
+      start_supervised!(ContextRegistry)
+      :ok
+    end
+
     test_with_mock "writes the metric when given a series", Connection,
       write: fn metrics -> {:ok, metrics} end do
       series = struct(Series, @map)
@@ -58,13 +58,6 @@ defmodule Zexbox.Metrics.ClientTest do
 
       assert {:ok, @map} = Task.await(task)
       Zexbox.Metrics.enable_for_process()
-    end
-  end
-
-  defp ensure_registry_started do
-    case Process.whereis(ContextRegistry) do
-      nil -> {:ok, _pid} = ContextRegistry.start_link()
-      _pid -> :ok
     end
   end
 end
