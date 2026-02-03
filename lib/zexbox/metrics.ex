@@ -12,7 +12,7 @@ defmodule Zexbox.Metrics do
   """
 
   use Supervisor
-  alias Zexbox.Metrics.MetricHandler
+  alias Zexbox.Metrics.{Context, MetricHandler}
   alias Zexbox.Telemetry
 
   @doc """
@@ -24,6 +24,7 @@ defmodule Zexbox.Metrics do
       {:ok,
        {%{intensity: 3, period: 5, strategy: :one_for_one, auto_shutdown: :never},
         [
+          %{id: Zexbox.Metrics.ContextRegistry, ...},
           %{
             id: Zexbox.Metrics.Connection,
             start: {Instream.Connection.Supervisor, :start_link, [Zexbox.Metrics.Connection]}
@@ -32,9 +33,35 @@ defmodule Zexbox.Metrics do
   """
   @impl Supervisor
   def init(_args) do
-    children = [Zexbox.Metrics.Connection]
+    children = [
+      Zexbox.Metrics.ContextRegistry,
+      Zexbox.Metrics.Connection
+    ]
     Supervisor.init(children, strategy: :one_for_one)
   end
+
+  @doc """
+  Disables metric writing for the current process. Writes from this process
+  (and from tasks spawned with `Task.async` that have this process in `$callers`)
+  will be skipped until `enable_for_process/0` is called or the process exits.
+
+  Use this in a Plug or elsewhere when you want to suppress metrics for a request
+  (e.g. when a header indicates a test or health check).
+  """
+  @spec disable_for_process() :: :ok
+  def disable_for_process, do: Context.disable_for_process()
+
+  @doc """
+  Re-enables metric writing for the current process.
+  """
+  @spec enable_for_process() :: :ok
+  def enable_for_process, do: Context.enable_for_process()
+
+  @doc """
+  Returns true if the current process has disabled metrics.
+  """
+  @spec disabled?() :: boolean()
+  def disabled?, do: Context.disabled?()
 
   @doc """
   Starts the metrics supervisor and attaches the controller metrics.

@@ -168,6 +168,22 @@ metric = %Zexbox.Metrics.Series{
 Zexbox.Metrics.Client.write_metric(metric)
 ```
 
+### Disabling Metrics For a Single Request/Process
+
+If you want to suppress metrics for a specific request (for example: test traffic, synthetic checks, or health probes), disable metrics for the **current process**:
+
+```elixir
+Zexbox.Metrics.disable_for_process()
+```
+
+All metric writes from that process will be skipped (including the default controller metrics and any custom calls to `Zexbox.Metrics.Client.write_metric/1`). If you spawn tasks using `Task.async/1`, the disabled state is also respected in the spawned task via the caller chain.
+
+To re-enable metrics for the current process:
+
+```elixir
+Zexbox.Metrics.enable_for_process()
+```
+
 ## Copyright and License
 
 Copyright (c) 2024, Zappistore.

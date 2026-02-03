@@ -51,12 +51,17 @@ defmodule Zexbox.Metrics.Client do
   """
 
   alias Zexbox.Metrics.{Connection, ControllerSeries, Series}
+  alias Zexbox.Metrics.Context
   require Logger
 
   @type series :: ControllerSeries.t() | Series.t()
 
   @doc """
   Write a metric to InfluxDB.
+
+  Skips writing (and returns `{:ok, metrics}`) when metrics are disabled for
+  the current process or for any process in its caller chain (e.g. a request
+  that called `Zexbox.Metrics.disable_for_process/0`).
 
   ## Examples
 
@@ -75,6 +80,14 @@ defmodule Zexbox.Metrics.Client do
     do: write_to_influx(metrics)
 
   defp write_to_influx(metrics) do
+    if Context.metrics_disabled?() do
+      {:ok, metrics}
+    else
+      do_write_to_influx(metrics)
+    end
+  end
+
+  defp do_write_to_influx(metrics) do
     Connection.write(metrics)
   rescue
     error ->
