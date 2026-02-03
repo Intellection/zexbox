@@ -10,6 +10,7 @@ defmodule Zexbox.Metrics.ContextRegistryTest do
       start_supervised!(ContextRegistry)
       :ok
     end
+
     test "registers and unregisters a pid" do
       pid = self()
 
