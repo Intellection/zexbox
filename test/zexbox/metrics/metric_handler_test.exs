@@ -3,6 +3,7 @@ defmodule Zexbox.Metrics.MetricHandlerTest do
   import ExUnit.CaptureLog
   import Mock
   alias Zexbox.Metrics.{Connection, ControllerSeries, MetricHandler}
+  alias Zexbox.Metrics.ContextRegistry
 
   setup_all do
     ensure_registry_started()
@@ -123,8 +124,8 @@ defmodule Zexbox.Metrics.MetricHandlerTest do
   end
 
   defp ensure_registry_started do
-    case Process.whereis(Zexbox.Metrics.ContextRegistry) do
-      nil -> {:ok, _pid} = Zexbox.Metrics.ContextRegistry.start_link()
+    case Process.whereis(ContextRegistry) do
+      nil -> {:ok, _pid} = ContextRegistry.start_link()
       _pid -> :ok
     end
   end

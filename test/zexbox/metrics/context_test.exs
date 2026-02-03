@@ -1,7 +1,7 @@
 defmodule Zexbox.Metrics.ContextTest do
   use ExUnit.Case
 
-  alias Zexbox.Metrics.Context
+  alias Zexbox.Metrics.{Context, ContextRegistry}
 
   setup_all do
     ensure_registry_started()
@@ -36,8 +36,8 @@ defmodule Zexbox.Metrics.ContextTest do
   end
 
   defp ensure_registry_started do
-    case Process.whereis(Zexbox.Metrics.ContextRegistry) do
-      nil -> {:ok, _pid} = Zexbox.Metrics.ContextRegistry.start_link()
+    case Process.whereis(ContextRegistry) do
+      nil -> {:ok, _pid} = ContextRegistry.start_link()
       _pid -> :ok
     end
   end

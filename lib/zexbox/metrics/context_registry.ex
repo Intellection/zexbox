@@ -8,6 +8,7 @@ defmodule Zexbox.Metrics.ContextRegistry do
 
   @table :zexbox_metrics_disabled_pids
 
+  @spec start_link(keyword()) :: GenServer.on_start()
   def start_link(opts \\ []) do
     case GenServer.start_link(__MODULE__, opts, name: __MODULE__) do
       {:ok, pid} -> {:ok, pid}
@@ -39,7 +40,7 @@ defmodule Zexbox.Metrics.ContextRegistry do
   @spec disabled?(pid()) :: boolean()
   def disabled?(pid) when is_pid(pid) do
     case :ets.lookup(@table, pid) do
-      [{^pid, _}] -> true
+      [{^pid, _present}] -> true
       [] -> false
     end
   end
@@ -66,7 +67,7 @@ defmodule Zexbox.Metrics.ContextRegistry do
   @impl GenServer
   def handle_call({:unregister, pid}, _from, state) do
     case Map.pop(state.pid_to_ref, pid) do
-      {nil, _} ->
+      {nil, _pid_to_ref} ->
         {:reply, :ok, state}
 
       {ref, pid_to_ref} ->
@@ -78,9 +79,9 @@ defmodule Zexbox.Metrics.ContextRegistry do
   end
 
   @impl GenServer
-  def handle_info({:DOWN, ref, _, _pid, _reason}, state) do
+  def handle_info({:DOWN, ref, _type, _pid, _reason}, state) do
     case Map.pop(state.ref_to_pid, ref) do
-      {nil, _} ->
+      {nil, _ref_to_pid} ->
         {:noreply, state}
 
       {pid, ref_to_pid} ->
