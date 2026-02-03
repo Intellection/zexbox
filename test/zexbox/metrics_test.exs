@@ -9,8 +9,12 @@ defmodule Zexbox.MetricsTest do
 
   test "init/1 initializes the metrics supervisor" do
     assert {:ok,
-            {%{intensity: 3, period: 5, strategy: :one_for_one},
+            {%{intensity: 3, period: 5, strategy: :one_for_one, auto_shutdown: :never},
              [
+               %{
+                 id: Zexbox.Metrics.ContextRegistry,
+                 start: {Zexbox.Metrics.ContextRegistry, :start_link, [[]]}
+               },
                %{
                  id: Zexbox.Metrics.Connection,
                  start: {Instream.Connection.Supervisor, :start_link, [Zexbox.Metrics.Connection]}
