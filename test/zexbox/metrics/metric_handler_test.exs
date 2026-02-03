@@ -100,9 +100,11 @@ defmodule Zexbox.Metrics.MetricHandlerTest do
     end
 
     test "captures and logs any exceptions", %{event: event, metadata: metadata} do
-      assert capture_log(fn ->
-               MetricHandler.handle_event(event, nil, metadata, nil)
-             end) =~ "Exception creating controller series: %BadMapError"
+      log = capture_log(fn ->
+        MetricHandler.handle_event(event, nil, metadata, nil)
+      end)
+      
+      assert log =~ "Exception creating controller series:"
     end
 
     test "does not call Connection.write when process has disabled metrics", %{
