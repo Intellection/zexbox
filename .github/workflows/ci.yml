@@ -1,0 +1,93 @@
+name: CI
+on:
+  push:
+    branches: [main,master]
+  pull_request:
+    branches: [main,master]
+jobs:
+  test:
+    name: Test (Elixir ${{ matrix.elixir }} | OTP ${{ matrix.otp }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - elixir: 1.18.x
+            otp: 27
+            os: ubuntu-22.04
+          - elixir: 1.19.x
+            otp: 28
+            os: ubuntu-22.04
+    env:
+      MIX_ENV: test
+    steps:
+      - name: Setup Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: ${{ matrix.elixir }}
+          otp-version: ${{ matrix.otp }}
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        id: cache-deps
+        with:
+          path: |
+            deps
+            _build
+          key: |
+            mix-${{ runner.os }}-${{ matrix.elixir }}-${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            mix-${{ runner.os }}-${{ matrix.elixir }}-${{ matrix.otp }}-
+      - name: Install dependencies
+        run: mix deps.get
+
+      - name: Compile
+        run: mix compile
+
+      - name: Check for unused packages
+        run: mix deps.unlock --check-unused
+
+      - run: mix format --check-formatted
+
+      - run: mix credo --strict
+
+      - run: mix dialyzer
+
+      - name: Check for abandonded packages
+        run: mix hex.audit
+
+      - name: Check outdated dependencies
+        run: mix hex.outdated --within-requirements || true
+
+      - name: Check for vulnerable packages
+        run: mix hex.audit
+
+      - name: Run tests
+        run: mix test
+
+      - name: Run tests (with coverage)
+        run: mix test --cover --export-coverage default
+
+      - name: Scan for security vulnerabilities
+        run: mix sobelow --exit --threshold medium
+
+  publish:
+    name: Publish (Dry Run)
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: erlef/setup-beam@v1
+        with:
+          elixir-version: 1.18
+          otp-version: 27
+      - name: Fetch dependencies
+        run: mix deps.get
+      - name: Compile
+        run: mix compile
+      - name: Publish package
+        env:
+          HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
+        run: mix hex.publish --organization ${{ vars.HEX_ORG }} --dry-run --replace --yes

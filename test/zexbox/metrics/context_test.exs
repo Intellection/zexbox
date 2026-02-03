@@ -3,12 +3,12 @@ defmodule Zexbox.Metrics.ContextTest do
 
   alias Zexbox.Metrics.{Context, ContextRegistry}
 
-  setup_all do
-    ensure_registry_started()
-    :ok
-  end
-
   describe "disable_for_process/0 and enable_for_process/0" do
+    setup do
+      start_supervised!(ContextRegistry)
+      :ok
+    end
+
     test "toggles disabled? for the current process" do
       assert Context.disabled?() == false
 
@@ -32,13 +32,6 @@ defmodule Zexbox.Metrics.ContextTest do
       assert Task.await(task) == true
 
       :ok = Zexbox.Metrics.enable_for_process()
-    end
-  end
-
-  defp ensure_registry_started do
-    case Process.whereis(ContextRegistry) do
-      nil -> {:ok, _pid} = ContextRegistry.start_link()
-      _pid -> :ok
     end
   end
 end

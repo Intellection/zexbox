@@ -1,7 +1,7 @@
 # Zexbox
 
 [![Hex.pm](https://img.shields.io/hexpm/v/zexbox.svg)](https://hex.pm/packages/zexbox)
-[![CircleCI](https://dl.circleci.com/status-badge/img/gh/Intellection/zexbox/tree/master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/Intellection/zexbox/tree/master)
+[![CI](https://github.com/Intellection/zexbox/actions/workflows/ci.yml/badge.svg)](https://github.com/Intellection/zexbox/actions/workflows/ci.yml)
 [![Documentation](https://img.shields.io/badge/documentation-gray)](https://hexdocs.pm/zexbox/api-reference.html)
 
 ## Installation
@@ -15,6 +15,8 @@ end
 ```
 
 ## LaunchDarkly Feature Flags
+
+The Zexbox library provides an idiomatic Elixir wrapper around the LaunchDarkly Erlang SDK with support for contexts, multi-contexts, and all modern LaunchDarkly features.
 
 ### Configuration
 
@@ -80,7 +82,35 @@ end
 
 Stopping a client with a custom tag can be done using the `Zexbox.Flags.stop/1` function.
 
-Evaluating a flag can be achieved by simply calling the `Zexbox.Flags.variation/3` function.
+### Using Contexts
+
+Contexts are the recommended way to evaluate feature flags. They provide type safety and support for multi-entity targeting:
+
+```elixir
+alias Zexbox.Flags.Context
+
+# Simple user context
+context = Context.new("user-123")
+Zexbox.Flags.variation("my-flag", context, false)
+
+# Context with attributes
+context =
+  Context.new("user-123")
+  |> Context.set("email", "user@example.com")
+  |> Context.set("plan", "enterprise")
+  |> Context.set_private_attributes(["email"])
+
+Zexbox.Flags.variation("premium-feature", context, false)
+
+# Multi-context (target based on user AND organization)
+user = Context.new("user-123", "user")
+org = Context.new("org-456", "organization")
+multi = Context.new_multi([user, org])
+
+Zexbox.Flags.variation("enterprise-feature", multi, false)
+```
+
+**Backward Compatibility**: Raw maps are still supported:
 
 ```elixir
 Zexbox.Flags.variation(
@@ -89,6 +119,8 @@ Zexbox.Flags.variation(
   "my_default_value"
 )
 ```
+
+For more details, see the [Context Module Guide](CONTEXT_MODULE_GUIDE.md).
 
 ## Logging
 
