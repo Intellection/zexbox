@@ -8,6 +8,7 @@ defmodule Zexbox.Metrics.ContextTest do
       ensure_registry_started()
       :ok
     end
+
     test "toggles disabled? for the current process" do
       assert Context.disabled?() == false
 
