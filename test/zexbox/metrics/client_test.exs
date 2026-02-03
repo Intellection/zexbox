@@ -3,6 +3,7 @@ defmodule Zexbox.Metrics.ClientTest do
   import ExUnit.CaptureLog
   import Mock
   alias Zexbox.Metrics.{Client, Connection, Series}
+  alias Zexbox.Metrics.ContextRegistry
 
   setup_all do
     ensure_registry_started()
@@ -38,8 +39,9 @@ defmodule Zexbox.Metrics.ClientTest do
              end) =~ "Failed to write metric to InfluxDB: %RuntimeError{message: \"Bork\"}"
     end
 
-    test_with_mock "skips writing and returns {:ok, metrics} when metrics disabled for process", Connection,
-      write: fn _metrics -> raise "should not be called" end do
+    test_with_mock "skips writing and returns {:ok, metrics} when metrics disabled for process",
+                   Connection,
+                   write: fn _metrics -> raise "should not be called" end do
       Zexbox.Metrics.disable_for_process()
       assert {:ok, @map} = Client.write_metric(@map)
       Zexbox.Metrics.enable_for_process()
@@ -48,18 +50,20 @@ defmodule Zexbox.Metrics.ClientTest do
     test_with_mock "skips writing from task when parent process disabled metrics", Connection,
       write: fn _metrics -> raise "should not be called" end do
       Zexbox.Metrics.disable_for_process()
+
       task =
         Task.async(fn ->
           Client.write_metric(@map)
         end)
+
       assert {:ok, @map} = Task.await(task)
       Zexbox.Metrics.enable_for_process()
     end
   end
 
   defp ensure_registry_started do
-    case Process.whereis(Zexbox.Metrics.ContextRegistry) do
-      nil -> {:ok, _pid} = Zexbox.Metrics.ContextRegistry.start_link()
+    case Process.whereis(ContextRegistry) do
+      nil -> {:ok, _pid} = ContextRegistry.start_link()
       _pid -> :ok
     end
   end
