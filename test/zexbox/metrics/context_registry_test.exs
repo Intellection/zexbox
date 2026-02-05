@@ -45,6 +45,12 @@ defmodule Zexbox.Metrics.ContextRegistryTest do
       # Wait until the registry processes the :DOWN and removes ETS entry.
       eventually(fn -> ContextRegistry.disabled?(pid) == false end)
     end
+
+    test "disabled?/1 returns false for non-pid values" do
+      assert ContextRegistry.disabled?(nil) == false
+      assert ContextRegistry.disabled?({:not, :a, :pid}) == false
+      assert ContextRegistry.disabled?([self()]) == false
+    end
   end
 
   defp eventually(predicate, attempts \\ 50)

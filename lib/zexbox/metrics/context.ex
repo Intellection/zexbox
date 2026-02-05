@@ -40,8 +40,10 @@ defmodule Zexbox.Metrics.Context do
   """
   @spec metrics_disabled?() :: boolean()
   def metrics_disabled? do
-    pids_to_check = [self()] ++ callers() ++ ancestors()
-    Enum.any?(pids_to_check, &ContextRegistry.disabled?/1)
+    ([self()] ++ callers() ++ ancestors())
+    |> List.flatten()
+    |> Enum.filter(&(is_pid(&1) or is_atom(&1)))
+    |> Enum.any?(&ContextRegistry.disabled?/1)
   end
 
   defp callers do

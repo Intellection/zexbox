@@ -37,13 +37,15 @@ defmodule Zexbox.Metrics.ContextRegistry do
   @doc """
   Returns true if the given pid is in the disabled set.
   """
-  @spec disabled?(pid()) :: boolean()
-  def disabled?(pid) when is_pid(pid) do
+  @spec disabled?(pid() | atom() | nil) :: boolean()
+  def disabled?(pid) when is_pid(pid) or is_atom(pid) do
     case :ets.lookup(@table, pid) do
       [{^pid, _present}] -> true
       [] -> false
     end
   end
+
+  def disabled?(_pid), do: false
 
   @impl GenServer
   def init(_opts) do
