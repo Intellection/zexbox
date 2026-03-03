@@ -57,17 +57,35 @@ defmodule Zexbox.AutoEscalationTest do
   # Capturing mock helper — returns the opts that were passed to create_issue.
   defp capture_create_issue do
     me = self()
-    [create_issue: fn opts -> send(me, {:create_opts, opts}); {:ok, @created_ticket} end]
+
+    [
+      create_issue: fn opts ->
+        send(me, {:create_opts, opts})
+        {:ok, @created_ticket}
+      end
+    ]
   end
 
   defp capture_add_comment do
     me = self()
-    [add_comment: fn opts -> send(me, {:comment_opts, opts}); {:ok, %{}} end]
+
+    [
+      add_comment: fn opts ->
+        send(me, {:comment_opts, opts})
+        {:ok, %{}}
+      end
+    ]
   end
 
   defp capture_search do
     me = self()
-    [search_latest_issues: fn opts -> send(me, {:search_opts, opts}); {:ok, []} end]
+
+    [
+      search_latest_issues: fn opts ->
+        send(me, {:search_opts, opts})
+        {:ok, []}
+      end
+    ]
   end
 
   setup do
@@ -178,7 +196,10 @@ defmodule Zexbox.AutoEscalationTest do
       me = self()
 
       jira_overrides = [
-        transition_issue: fn opts -> send(me, {:transition_opts, opts}); {:ok, %{}} end
+        transition_issue: fn opts ->
+          send(me, {:transition_opts, opts})
+          {:ok, %{}}
+        end
       ]
 
       with_mocks(all_mocks(jira_overrides)) do
