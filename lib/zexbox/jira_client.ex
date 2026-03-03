@@ -32,18 +32,14 @@ defmodule Zexbox.JiraClient do
   @doc """
   Search for the latest issues matching a JQL query (max 50 results).
 
-  Options:
-  - `:jql` (required) – JQL query string.
-  - `:project_key` (optional) – prepends `project = KEY AND` to the JQL.
+  - `jql` – JQL query string.
+  - `project_key` – optional; prepends `project = KEY AND` to the JQL.
 
   Returns `{:ok, [issue_map]}` where each map includes a `"url"` browse key,
   or `{:error, reason}` on failure.
   """
-  @spec search_latest_issues(keyword()) :: {:ok, [map()]} | {:error, term()}
-  def search_latest_issues(opts) do
-    jql = Keyword.fetch!(opts, :jql)
-    project_key = Keyword.get(opts, :project_key)
-
+  @spec search_latest_issues(String.t(), String.t() | nil) :: {:ok, [map()]} | {:error, term()}
+  def search_latest_issues(jql, project_key \\ nil) do
     query = if project_key, do: "project = #{project_key} AND #{jql}", else: jql
 
     client = build_client()
@@ -67,25 +63,18 @@ defmodule Zexbox.JiraClient do
   @doc """
   Create a new Jira issue.
 
-  Options:
-  - `:project_key` – Jira project key (e.g. `"SS"`).
-  - `:summary` – issue summary string.
-  - `:description` – ADF map (already built; not converted).
-  - `:issuetype` – issue type name (e.g. `"Bug"`).
-  - `:priority` – priority name (e.g. `"High"`).
-  - `:custom_fields` – map of custom field ID → value (string keys).
+  - `project_key` – Jira project key (e.g. `"SS"`).
+  - `summary` – issue summary string.
+  - `description` – ADF map (already built; not converted).
+  - `issuetype` – issue type name (e.g. `"Bug"`).
+  - `priority` – priority name (e.g. `"High"`).
+  - `custom_fields` – optional map of custom field ID → value (string keys).
 
   Returns `{:ok, issue_map}` with a `"url"` browse key added, or `{:error, reason}`.
   """
-  @spec create_issue(keyword()) :: {:ok, map()} | {:error, term()}
-  def create_issue(opts) do
-    project_key = Keyword.fetch!(opts, :project_key)
-    summary = Keyword.fetch!(opts, :summary)
-    description = Keyword.fetch!(opts, :description)
-    issuetype = Keyword.fetch!(opts, :issuetype)
-    priority = Keyword.fetch!(opts, :priority)
-    custom_fields = Keyword.get(opts, :custom_fields, %{})
-
+  @spec create_issue(String.t(), String.t(), map(), String.t(), String.t(), map()) ::
+          {:ok, map()} | {:error, term()}
+  def create_issue(project_key, summary, description, issuetype, priority, custom_fields \\ %{}) do
     fields =
       Map.merge(
         %{
@@ -113,17 +102,13 @@ defmodule Zexbox.JiraClient do
   @doc """
   Transition a Jira issue to a new status by name (case-insensitive match).
 
-  Options:
-  - `:issue_key` – issue key (e.g. `"SS-42"`).
-  - `:status_name` – target status name (e.g. `"To do"`).
+  - `issue_key` – issue key (e.g. `"SS-42"`).
+  - `status_name` – target status name (e.g. `"To do"`).
 
   Returns `{:ok, %{success: true, status: name}}` or `{:error, reason}`.
   """
-  @spec transition_issue(keyword()) :: {:ok, map()} | {:error, term()}
-  def transition_issue(opts) do
-    issue_key = Keyword.fetch!(opts, :issue_key)
-    status_name = Keyword.fetch!(opts, :status_name)
-
+  @spec transition_issue(String.t(), String.t()) :: {:ok, map()} | {:error, term()}
+  def transition_issue(issue_key, status_name) do
     client = build_client()
 
     with {:ok, data} <- jira_get(client, "/rest/api/3/issue/#{issue_key}/transitions"),
@@ -140,17 +125,13 @@ defmodule Zexbox.JiraClient do
   @doc """
   Add a comment to an existing Jira issue.
 
-  Options:
-  - `:issue_key` – issue key (e.g. `"SS-42"`).
-  - `:comment` – ADF map for the comment body (already built; not converted).
+  - `issue_key` – issue key (e.g. `"SS-42"`).
+  - `comment` – ADF map for the comment body (already built; not converted).
 
   Returns `{:ok, comment_map}` or `{:error, reason}`.
   """
-  @spec add_comment(keyword()) :: {:ok, map()} | {:error, term()}
-  def add_comment(opts) do
-    issue_key = Keyword.fetch!(opts, :issue_key)
-    comment = Keyword.fetch!(opts, :comment)
-
+  @spec add_comment(String.t(), map()) :: {:ok, map()} | {:error, term()}
+  def add_comment(issue_key, comment) do
     client = build_client()
     jira_post(client, "/rest/api/3/issue/#{issue_key}/comment", %{"body" => comment})
   end
