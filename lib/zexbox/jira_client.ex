@@ -55,7 +55,7 @@ defmodule Zexbox.JiraClient do
         issues = Enum.map(issues, &Map.put(&1, "url", "#{base_url}/browse/#{&1["key"]}"))
         {:ok, issues}
 
-      {:error, _} = err ->
+      {:error, _reason} = err ->
         err
     end
   end
@@ -94,7 +94,7 @@ defmodule Zexbox.JiraClient do
         base_url = config(:jira_base_url, nil)
         {:ok, Map.put(result, "url", "#{base_url}/browse/#{result["key"]}")}
 
-      {:error, _} = err ->
+      {:error, _reason} = err ->
         err
     end
   end
@@ -114,7 +114,7 @@ defmodule Zexbox.JiraClient do
     with {:ok, data} <- jira_get(client, "/rest/api/3/issue/#{issue_key}/transitions"),
          transitions = Map.get(data, "transitions", []),
          {:ok, target} <- find_transition(transitions, status_name),
-         {:ok, _} <-
+         {:ok, _resp} <-
            jira_post(client, "/rest/api/3/issue/#{issue_key}/transitions", %{
              "transition" => %{"id" => target["id"]}
            }) do

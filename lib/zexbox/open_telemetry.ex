@@ -31,7 +31,7 @@ defmodule Zexbox.OpenTelemetry do
     value = :otel_baggage.get_all() |> Map.get("datadog.session.url")
     if is_binary(value), do: value, else: nil
   rescue
-    _ -> nil
+    _e -> nil
   end
 
   @doc """
@@ -42,7 +42,7 @@ defmodule Zexbox.OpenTelemetry do
     ctx = get_span_ctx()
     ctx != nil && :otel_span.is_valid(ctx)
   rescue
-    _ -> false
+    _e -> false
   end
 
   @doc """
@@ -62,7 +62,7 @@ defmodule Zexbox.OpenTelemetry do
       end
     end
   rescue
-    _ -> nil
+    _e -> nil
   end
 
   @doc """
@@ -85,7 +85,7 @@ defmodule Zexbox.OpenTelemetry do
         "sort:!(!('@timestamp',asc)))&_g=(filters:!(),time:(from:now-1d,to:now))"
     end
   rescue
-    _ -> nil
+    _e -> nil
   end
 
   # --- Private ---
@@ -93,9 +93,9 @@ defmodule Zexbox.OpenTelemetry do
   defp get_span_ctx do
     :otel_tracer.current_span_ctx()
   rescue
-    _ -> nil
+    _e -> nil
   catch
-    _, _ -> nil
+    _kind, _e -> nil
   end
 
   defp hex_trace_id do
@@ -140,7 +140,7 @@ defmodule Zexbox.OpenTelemetry do
         :production -> @production_tempo_uid
         :sandbox -> @sandbox_tempo_uid
         :test -> "test"
-        _ -> "development"
+        _env -> "development"
       end
   end
 
