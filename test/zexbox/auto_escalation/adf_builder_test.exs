@@ -110,6 +110,7 @@ defmodule Zexbox.AutoEscalation.AdfBuilderTest do
           AdfBuilder.build_description(runtime_error(), %{}, %{},
             custom_description: "First.\n\nSecond."
           )
+
         json = Jason.encode!(result)
         assert json =~ "First."
         assert json =~ "Second."
@@ -119,7 +120,10 @@ defmodule Zexbox.AutoEscalation.AdfBuilderTest do
     test "adds a divider before custom_description when present" do
       with_all_urls(fn ->
         result =
-          AdfBuilder.build_description(runtime_error(), %{}, %{}, custom_description: "Some context.")
+          AdfBuilder.build_description(runtime_error(), %{}, %{},
+            custom_description: "Some context."
+          )
+
         json = Jason.encode!(result)
         assert json =~ ~s("type":"rule")
       end)
