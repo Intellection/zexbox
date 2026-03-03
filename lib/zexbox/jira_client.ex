@@ -48,11 +48,11 @@ defmodule Zexbox.JiraClient do
 
     client = build_client()
 
-    case jira_get(client, "/rest/api/3/search/jql",
-           jql: query,
-           maxResults: 50,
-           fields: "key,id,self,status,summary"
-         ) do
+    case jira_post(client, "/rest/api/3/search/jql", %{
+           "jql" => query,
+           "maxResults" => 50,
+           "fields" => ["key", "id", "self", "status", "summary"]
+         }) do
       {:ok, body} ->
         base_url = config(:jira_base_url, nil)
         issues = Map.get(body, "issues", [])
@@ -200,7 +200,8 @@ defmodule Zexbox.JiraClient do
 
     Req.new(
       base_url: base_url,
-      auth: {:basic, "#{email}:#{token}"}
+      auth: {:basic, "#{email}:#{token}"},
+      headers: [{"accept", "application/json"}]
     )
   end
 
