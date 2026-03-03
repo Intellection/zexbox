@@ -3,11 +3,10 @@ defmodule Zexbox.AutoEscalation.AdfBuilderTest do
   import Mock
   alias Zexbox.AutoEscalation.AdfBuilder
 
-  defp with_telemetry_urls(dd, trace, kibana, fun) do
+  defp with_telemetry_urls(trace, kibana, fun) do
     with_mocks([
       {Zexbox.OpenTelemetry, [],
        [
-         datadog_session_url: fn -> dd end,
          generate_trace_url: fn -> trace end,
          kibana_log_url: fn -> kibana end
        ]}
@@ -19,13 +18,12 @@ defmodule Zexbox.AutoEscalation.AdfBuilderTest do
   defp with_all_urls(fun),
     do:
       with_telemetry_urls(
-        "https://dd.example.com/session",
         "https://grafana.example.com/trace",
         "https://kibana.example.com/logs",
         fun
       )
 
-  defp with_no_urls(fun), do: with_telemetry_urls(nil, nil, nil, fun)
+  defp with_no_urls(fun), do: with_telemetry_urls(nil, nil, fun)
 
   defp runtime_error(msg \\ "Something broke"), do: %RuntimeError{message: msg}
 
@@ -39,14 +37,12 @@ defmodule Zexbox.AutoEscalation.AdfBuilderTest do
       end)
     end
 
-    test "first block is a telemetry paragraph with all three links" do
+    test "first block is a telemetry paragraph with Tempo and Kibana links" do
       with_all_urls(fn ->
         result = AdfBuilder.build_description(runtime_error(), %{}, %{})
         [telemetry | _] = result.content
         assert telemetry.type == "paragraph"
         json = Jason.encode!(telemetry)
-        assert json =~ "Datadog Session Recording"
-        assert json =~ "https://dd.example.com/session"
         assert json =~ "Tempo Trace View"
         assert json =~ "https://grafana.example.com/trace"
         assert json =~ "Kibana Logs"
@@ -59,7 +55,6 @@ defmodule Zexbox.AutoEscalation.AdfBuilderTest do
         result = AdfBuilder.build_description(runtime_error(), %{}, %{})
         [telemetry | _] = result.content
         json = Jason.encode!(telemetry)
-        assert json =~ "Datadog Session Recording (Missing)"
         assert json =~ "Tempo Trace View (Missing)"
         assert json =~ "Kibana Logs (Missing)"
       end)
@@ -189,7 +184,7 @@ defmodule Zexbox.AutoEscalation.AdfBuilderTest do
       with_all_urls(fn ->
         result = AdfBuilder.build_comment(runtime_error(), "pay", %{}, %{})
         json = Jason.encode!(result)
-        assert json =~ "Datadog Session Recording"
+        assert json =~ "Tempo Trace View"
       end)
     end
 

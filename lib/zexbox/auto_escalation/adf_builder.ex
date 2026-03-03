@@ -82,14 +82,11 @@ defmodule Zexbox.AutoEscalation.AdfBuilder do
   defp doc(content), do: %{version: 1, type: "doc", content: content}
 
   defp telemetry_paragraph do
-    dd_url = OpenTelemetry.datadog_session_url()
     trace_url = OpenTelemetry.generate_trace_url()
     kibana_url = OpenTelemetry.kibana_log_url()
 
     inline =
-      link_or_plain("Datadog Session Recording", dd_url) ++
-        [text(" | ")] ++
-        link_or_plain("Tempo Trace View", trace_url) ++
+      link_or_plain("Tempo Trace View", trace_url) ++
         [text(" | ")] ++
         link_or_plain("Kibana Logs", kibana_url)
 
