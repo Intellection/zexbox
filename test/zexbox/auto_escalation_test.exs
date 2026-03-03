@@ -41,7 +41,6 @@ defmodule Zexbox.AutoEscalationTest do
   defp otel_mocks(overrides \\ []) do
     Keyword.merge(
       [
-        datadog_session_url: fn -> nil end,
         generate_trace_url: fn -> nil end,
         kibana_log_url: fn -> nil end
       ],
