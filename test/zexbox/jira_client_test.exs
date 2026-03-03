@@ -33,7 +33,7 @@ defmodule Zexbox.JiraClientTest do
     end
   end
 
-  describe "search_latest_issues/1" do
+  describe "search_latest_issues/2" do
     test_with_mock "returns issues with url keys added on success", Req,
       new: fn _opts -> :mock_client end,
       post: fn :mock_client, _opts ->
@@ -51,9 +51,7 @@ defmodule Zexbox.JiraClientTest do
            }
          }}
       end do
-      assert {:ok, [issue]} =
-               JiraClient.search_latest_issues(jql: "status = Open", project_key: "SS")
-
+      assert {:ok, [issue]} = JiraClient.search_latest_issues("status = Open", "SS")
       assert issue["key"] == "SS-1"
       assert issue["url"] == "#{@base_url}/browse/SS-1"
     end
@@ -63,7 +61,7 @@ defmodule Zexbox.JiraClientTest do
       post: fn :mock_client, _opts ->
         {:ok, %{status: 200, body: %{"issues" => []}}}
       end do
-      assert {:ok, []} = JiraClient.search_latest_issues(jql: "status = Open")
+      assert {:ok, []} = JiraClient.search_latest_issues("status = Open")
     end
 
     test_with_mock "returns error on non-2xx response", Req,
@@ -71,7 +69,7 @@ defmodule Zexbox.JiraClientTest do
       post: fn :mock_client, _opts ->
         {:ok, %{status: 401, body: %{"message" => "Unauthorized"}}}
       end do
-      assert {:error, reason} = JiraClient.search_latest_issues(jql: "status = Open")
+      assert {:error, reason} = JiraClient.search_latest_issues("status = Open")
       assert reason =~ "HTTP 401"
     end
 
@@ -80,11 +78,11 @@ defmodule Zexbox.JiraClientTest do
       post: fn :mock_client, _opts ->
         {:error, %{reason: :econnrefused}}
       end do
-      assert {:error, _reason} = JiraClient.search_latest_issues(jql: "status = Open")
+      assert {:error, _reason} = JiraClient.search_latest_issues("status = Open")
     end
   end
 
-  describe "create_issue/1" do
+  describe "create_issue/6" do
     test_with_mock "creates issue and adds url to result", Req,
       new: fn _opts -> :mock_client end,
       post: fn :mock_client, _opts ->
@@ -100,12 +98,12 @@ defmodule Zexbox.JiraClientTest do
       end do
       assert {:ok, result} =
                JiraClient.create_issue(
-                 project_key: "SS",
-                 summary: "checkout: RuntimeError",
-                 description: %{version: 1, type: "doc", content: []},
-                 issuetype: "Bug",
-                 priority: "High",
-                 custom_fields: %{"customfield_13442" => "checkout::RuntimeError"}
+                 "SS",
+                 "checkout: RuntimeError",
+                 %{version: 1, type: "doc", content: []},
+                 "Bug",
+                 "High",
+                 %{"customfield_13442" => "checkout::RuntimeError"}
                )
 
       assert result["key"] == "SS-99"
@@ -118,20 +116,13 @@ defmodule Zexbox.JiraClientTest do
         {:ok, %{status: 400, body: %{"errorMessages" => ["Invalid project"]}}}
       end do
       assert {:error, reason} =
-               JiraClient.create_issue(
-                 project_key: "INVALID",
-                 summary: "test",
-                 description: %{},
-                 issuetype: "Bug",
-                 priority: "High",
-                 custom_fields: %{}
-               )
+               JiraClient.create_issue("INVALID", "test", %{}, "Bug", "High")
 
       assert reason =~ "HTTP 400"
     end
   end
 
-  describe "transition_issue/1" do
+  describe "transition_issue/2" do
     test_with_mock "transitions issue to target status", Req,
       new: fn _opts -> :mock_client end,
       get: fn :mock_client, _opts ->
@@ -151,7 +142,7 @@ defmodule Zexbox.JiraClientTest do
         {:ok, %{status: 204, body: nil}}
       end do
       assert {:ok, %{success: true, status: "To do"}} =
-               JiraClient.transition_issue(issue_key: "SS-1", status_name: "To do")
+               JiraClient.transition_issue("SS-1", "To do")
     end
 
     test_with_mock "returns error when target status not found", Req,
@@ -163,14 +154,12 @@ defmodule Zexbox.JiraClientTest do
            body: %{"transitions" => [%{"id" => "11", "to" => %{"name" => "Done"}}]}
          }}
       end do
-      assert {:error, reason} =
-               JiraClient.transition_issue(issue_key: "SS-1", status_name: "Nonexistent")
-
+      assert {:error, reason} = JiraClient.transition_issue("SS-1", "Nonexistent")
       assert reason =~ "Cannot transition to"
     end
   end
 
-  describe "add_comment/1" do
+  describe "add_comment/2" do
     test_with_mock "adds comment and returns the response", Req,
       new: fn _opts -> :mock_client end,
       post: fn :mock_client, _opts ->
@@ -181,10 +170,7 @@ defmodule Zexbox.JiraClientTest do
          }}
       end do
       comment = %{version: 1, type: "doc", content: []}
-
-      assert {:ok, result} =
-               JiraClient.add_comment(issue_key: "SS-42", comment: comment)
-
+      assert {:ok, result} = JiraClient.add_comment("SS-42", comment)
       assert result["id"] == "30001"
     end
 
@@ -193,9 +179,7 @@ defmodule Zexbox.JiraClientTest do
       post: fn :mock_client, _opts ->
         {:ok, %{status: 404, body: %{"errorMessages" => ["Issue not found"]}}}
       end do
-      assert {:error, reason} =
-               JiraClient.add_comment(issue_key: "SS-999", comment: %{})
-
+      assert {:error, reason} = JiraClient.add_comment("SS-999", %{})
       assert reason =~ "HTTP 404"
     end
   end
