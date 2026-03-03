@@ -42,12 +42,18 @@ defmodule Zexbox.JiraClientTest do
            status: 200,
            body: %{
              "issues" => [
-               %{"key" => "SS-1", "id" => "10001", "self" => "#{@base_url}/rest/api/3/issue/10001"}
+               %{
+                 "key" => "SS-1",
+                 "id" => "10001",
+                 "self" => "#{@base_url}/rest/api/3/issue/10001"
+               }
              ]
            }
          }}
       end do
-      assert {:ok, [issue]} = JiraClient.search_latest_issues(jql: "status = Open", project_key: "SS")
+      assert {:ok, [issue]} =
+               JiraClient.search_latest_issues(jql: "status = Open", project_key: "SS")
+
       assert issue["key"] == "SS-1"
       assert issue["url"] == "#{@base_url}/browse/SS-1"
     end
