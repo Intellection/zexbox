@@ -18,11 +18,11 @@ defmodule Zexbox.AutoEscalation do
   rescue
     e ->
       Zexbox.AutoEscalation.handle_error(
-        error: e,
+        e,
+        "checkout",
+        "High",
+        "Purchase Ops",
         stacktrace: __STACKTRACE__,
-        action: "checkout",
-        priority: "High",
-        zigl_team: "Purchase Ops",
         user_context: %{email: user.email},
         additional_context: %{basket_id: basket.id}
       )
@@ -74,11 +74,11 @@ defmodule Zexbox.AutoEscalation do
   @doc """
   Handle an error by finding or creating a Jira ticket.
 
-  Required options:
-  - `:error` – the `Exception.t()` that was rescued.
-  - `:action` – short label (e.g. `"checkout"`); used in the fingerprint and summary.
-  - `:priority` – Jira priority name (e.g. `"High"`).
-  - `:zigl_team` – value for the ZIGL Team custom field.
+  Required arguments:
+  - `error` – the `Exception.t()` that was rescued.
+  - `action` – short label (e.g. `"checkout"`); used in the fingerprint and summary.
+  - `priority` – Jira priority name (e.g. `"High"`).
+  - `zigl_team` – value for the ZIGL Team custom field.
 
   Optional options:
   - `:stacktrace` – pass `__STACKTRACE__` from the rescue block for a full trace.
@@ -87,10 +87,11 @@ defmodule Zexbox.AutoEscalation do
   - `:fingerprint` – override deduplication key; defaults to `"action::ErrorClass"`.
   - `:custom_description` – string rendered above Error Details (split on `\\n\\n`).
   """
-  @spec handle_error(keyword()) :: {:ok, map()} | {:error, term()} | {:disabled, nil}
-  def handle_error(opts) do
+  @spec handle_error(Exception.t(), String.t(), String.t(), String.t(), keyword()) ::
+          {:ok, map()} | {:error, term()} | {:disabled, nil}
+  def handle_error(error, action, priority, zigl_team, opts \\ []) do
     if auto_escalation_enabled?() do
-      do_handle_error(opts)
+      do_handle_error(error, action, priority, zigl_team, opts)
     else
       {:disabled, nil}
     end
@@ -101,28 +102,19 @@ defmodule Zexbox.AutoEscalation do
 
   ## Examples
 
-      iex> Zexbox.AutoEscalation.generate_fingerprint(error_class: "StandardError", action: "checkout")
+      iex> Zexbox.AutoEscalation.generate_fingerprint("StandardError", "checkout")
       "checkout::StandardError"
   """
-  @spec generate_fingerprint(keyword()) :: String.t()
-  def generate_fingerprint(opts) do
-    error_class = Keyword.fetch!(opts, :error_class)
-    action = Keyword.fetch!(opts, :action)
-    "#{action}::#{error_class}"
-  end
+  @spec generate_fingerprint(String.t(), String.t()) :: String.t()
+  def generate_fingerprint(error_class, action), do: "#{action}::#{error_class}"
 
   # --- Private ---
 
-  defp do_handle_error(opts) do
-    error = Keyword.fetch!(opts, :error)
-
+  defp do_handle_error(error, action, priority, zigl_team, opts) do
     unless is_exception(error) do
       raise ArgumentError, "Expected an Exception.t() for :error, got: #{inspect(error)}"
     end
 
-    action = Keyword.fetch!(opts, :action)
-    priority = Keyword.fetch!(opts, :priority)
-    zigl_team = Keyword.fetch!(opts, :zigl_team)
     user_context = Keyword.get(opts, :user_context, %{})
     additional_context = Keyword.get(opts, :additional_context, %{})
     stacktrace = Keyword.get(opts, :stacktrace)
@@ -132,31 +124,31 @@ defmodule Zexbox.AutoEscalation do
 
     fingerprint =
       Keyword.get(opts, :fingerprint) ||
-        generate_fingerprint(error_class: error_class, action: action)
+        generate_fingerprint(error_class, action)
 
     case find_existing_ticket(fingerprint) do
       nil ->
         create_jira_ticket(
-          error: error,
-          action: action,
-          priority: priority,
-          zigl_team: zigl_team,
-          fingerprint: fingerprint,
-          user_context: user_context,
-          additional_context: additional_context,
-          custom_description: custom_description,
-          stacktrace: stacktrace
+          error,
+          action,
+          priority,
+          zigl_team,
+          fingerprint,
+          user_context,
+          additional_context,
+          custom_description,
+          stacktrace
         )
 
       existing_ticket ->
         add_comment_to_existing_ticket(
-          ticket: existing_ticket,
-          error: error,
-          action: action,
-          user_context: user_context,
-          additional_context: additional_context,
-          custom_description: custom_description,
-          stacktrace: stacktrace
+          existing_ticket,
+          error,
+          action,
+          user_context,
+          additional_context,
+          custom_description,
+          stacktrace
         )
 
         {:ok, existing_ticket}
@@ -170,7 +162,7 @@ defmodule Zexbox.AutoEscalation do
     status_list = Enum.map_join(@resolved_statuses, ", ", fn s -> "\"#{s}\"" end)
     jql = "\"#{field_name}\" = \"#{escaped}\" AND status NOT IN (#{status_list})"
 
-    case JiraClient.search_latest_issues(jql: jql, project_key: project_key) do
+    case JiraClient.search_latest_issues(jql, project_key) do
       {:ok, []} ->
         nil
 
@@ -186,17 +178,17 @@ defmodule Zexbox.AutoEscalation do
     end
   end
 
-  defp create_jira_ticket(opts) do
-    error = Keyword.fetch!(opts, :error)
-    action = Keyword.fetch!(opts, :action)
-    priority = Keyword.fetch!(opts, :priority)
-    zigl_team = Keyword.fetch!(opts, :zigl_team)
-    fingerprint = Keyword.fetch!(opts, :fingerprint)
-    user_context = Keyword.fetch!(opts, :user_context)
-    additional_context = Keyword.fetch!(opts, :additional_context)
-    custom_description = Keyword.get(opts, :custom_description)
-    stacktrace = Keyword.get(opts, :stacktrace)
-
+  defp create_jira_ticket(
+         error,
+         action,
+         priority,
+         zigl_team,
+         fingerprint,
+         user_context,
+         additional_context,
+         custom_description,
+         stacktrace
+       ) do
     project_key = resolve_project_key()
     error_class = inspect(error.__struct__)
 
@@ -216,15 +208,14 @@ defmodule Zexbox.AutoEscalation do
 
     with {:ok, result} <-
            JiraClient.create_issue(
-             project_key: project_key,
-             summary: "#{action}: #{error_class}",
-             description: description,
-             issuetype: @issuetype,
-             priority: priority,
-             custom_fields: custom_fields
+             project_key,
+             "#{action}: #{error_class}",
+             description,
+             @issuetype,
+             priority,
+             custom_fields
            ),
-         {:ok, _} <-
-           JiraClient.transition_issue(issue_key: result["key"], status_name: @transition_to) do
+         {:ok, _} <- JiraClient.transition_issue(result["key"], @transition_to) do
       {:ok, result}
     else
       {:error, e} ->
@@ -236,15 +227,15 @@ defmodule Zexbox.AutoEscalation do
     end
   end
 
-  defp add_comment_to_existing_ticket(opts) do
-    ticket = Keyword.fetch!(opts, :ticket)
-    error = Keyword.fetch!(opts, :error)
-    action = Keyword.fetch!(opts, :action)
-    user_context = Keyword.fetch!(opts, :user_context)
-    additional_context = Keyword.fetch!(opts, :additional_context)
-    custom_description = Keyword.get(opts, :custom_description)
-    stacktrace = Keyword.get(opts, :stacktrace)
-
+  defp add_comment_to_existing_ticket(
+         ticket,
+         error,
+         action,
+         user_context,
+         additional_context,
+         custom_description,
+         stacktrace
+       ) do
     issue_key = ticket["key"]
 
     comment =
@@ -257,7 +248,7 @@ defmodule Zexbox.AutoEscalation do
         stacktrace: stacktrace
       )
 
-    case JiraClient.add_comment(issue_key: issue_key, comment: comment) do
+    case JiraClient.add_comment(issue_key, comment) do
       {:ok, _} ->
         :ok
 
