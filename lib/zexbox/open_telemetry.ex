@@ -23,18 +23,6 @@ defmodule Zexbox.OpenTelemetry do
   @compile_env Mix.env()
 
   @doc """
-  Returns the Datadog session URL from OTEL baggage, or `nil` if not set.
-  Set by the `X-Datadog-Session-Url` request header propagated into baggage.
-  """
-  @spec datadog_session_url() :: String.t() | nil
-  def datadog_session_url do
-    value = :otel_baggage.get_all() |> Map.get("datadog.session.url")
-    if is_binary(value), do: value, else: nil
-  rescue
-    _e -> nil
-  end
-
-  @doc """
   Returns `true` when the current OTEL span context is valid (non-zero trace ID).
   """
   @spec valid_active_span?() :: boolean()
