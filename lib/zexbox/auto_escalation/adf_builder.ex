@@ -182,5 +182,5 @@ defmodule Zexbox.AutoEscalation.AdfBuilder do
   defp has_content?(nil), do: false
   defp has_content?(""), do: false
   defp has_content?(str) when is_binary(str), do: String.trim(str) != ""
-  defp has_content?(_), do: false
+  defp has_content?(_other), do: false
 end

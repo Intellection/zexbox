@@ -40,7 +40,7 @@ defmodule Zexbox.AutoEscalation.AdfBuilderTest do
     test "first block is a telemetry paragraph with Tempo and Kibana links" do
       with_all_urls(fn ->
         result = AdfBuilder.build_description(runtime_error(), %{}, %{})
-        [telemetry | _] = result.content
+        [telemetry | _rest] = result.content
         assert telemetry.type == "paragraph"
         json = Jason.encode!(telemetry)
         assert json =~ "Tempo Trace View"
@@ -53,7 +53,7 @@ defmodule Zexbox.AutoEscalation.AdfBuilderTest do
     test "shows '(Missing)' for unavailable telemetry URLs" do
       with_no_urls(fn ->
         result = AdfBuilder.build_description(runtime_error(), %{}, %{})
-        [telemetry | _] = result.content
+        [telemetry | _rest] = result.content
         json = Jason.encode!(telemetry)
         assert json =~ "Tempo Trace View (Missing)"
         assert json =~ "Kibana Logs (Missing)"
@@ -93,8 +93,8 @@ defmodule Zexbox.AutoEscalation.AdfBuilderTest do
         assert json =~ "This happened during sync."
         assert json =~ "Error Details"
 
-        {cd_pos, _} = :binary.match(json, "This happened during sync.")
-        {ed_pos, _} = :binary.match(json, "Error Details")
+        {cd_pos, _len} = :binary.match(json, "This happened during sync.")
+        {ed_pos, _len} = :binary.match(json, "Error Details")
         assert cd_pos < ed_pos
       end)
     end
