@@ -40,24 +40,7 @@ defmodule Zexbox.JiraClient do
   """
   @spec search_latest_issues(String.t(), String.t() | nil) :: {:ok, [map()]} | {:error, term()}
   def search_latest_issues(jql, project_key \\ nil) do
-    query = if project_key, do: "project = #{project_key} AND #{jql}", else: jql
-
-    client = build_client()
-
-    case jira_get(client, "/rest/api/3/issue/search",
-           jql: query,
-           maxResults: 50,
-           fields: ["key", "id", "self", "status", "summary"]
-         ) do
-      {:ok, body} ->
-        base_url = config(:jira_base_url, nil)
-        issues = Map.get(body, "issues", [])
-        issues = Enum.map(issues, &Map.put(&1, "url", "#{base_url}/browse/#{&1["key"]}"))
-        {:ok, issues}
-
-      {:error, _reason} = err ->
-        err
-    end
+    fetch_issues(build_query(jql, project_key))
   end
 
   @doc """
@@ -75,28 +58,17 @@ defmodule Zexbox.JiraClient do
   @spec create_issue(String.t(), String.t(), map(), String.t(), String.t(), map()) ::
           {:ok, map()} | {:error, term()}
   def create_issue(project_key, summary, description, issuetype, priority, custom_fields \\ %{}) do
-    fields =
-      Map.merge(
-        %{
-          "project" => %{"key" => project_key},
-          "summary" => summary,
-          "description" => description,
-          "issuetype" => %{"name" => issuetype},
-          "priority" => %{"name" => priority}
-        },
-        custom_fields
-      )
-
-    client = build_client()
-
-    case jira_post(client, "/rest/api/3/issue", %{"fields" => fields}) do
-      {:ok, result} ->
-        base_url = config(:jira_base_url, nil)
-        {:ok, Map.put(result, "url", "#{base_url}/browse/#{result["key"]}")}
-
-      {:error, _reason} = err ->
-        err
-    end
+    Map.merge(
+      %{
+        "project" => %{"key" => project_key},
+        "summary" => summary,
+        "description" => description,
+        "issuetype" => %{"name" => issuetype},
+        "priority" => %{"name" => priority}
+      },
+      custom_fields
+    )
+    |> post_issue()
   end
 
   @doc """
@@ -136,14 +108,50 @@ defmodule Zexbox.JiraClient do
     jira_post(client, "/rest/api/3/issue/#{issue_key}/comment", %{"body" => comment})
   end
 
+  defp build_query(jql, nil), do: jql
+  defp build_query(jql, project_key), do: "project = #{project_key} AND #{jql}"
+
+  defp fetch_issues(query) do
+    build_client()
+    |> jira_get("/rest/api/3/issue/search",
+      jql: query,
+      maxResults: 50,
+      fields: ["key", "id", "self", "status", "summary"]
+    )
+    |> attach_issue_urls()
+  end
+
+  defp post_issue(fields) do
+    build_client()
+    |> jira_post("/rest/api/3/issue", %{"fields" => fields})
+    |> attach_issue_url()
+  end
+
+  defp attach_issue_urls({:ok, body}) do
+    base_url = config(:jira_base_url, nil)
+    issues = Map.get(body, "issues", [])
+    {:ok, Enum.map(issues, &Map.put(&1, "url", "#{base_url}/browse/#{&1["key"]}"))}
+  end
+
+  defp attach_issue_urls({:error, _reason} = err), do: err
+
+  defp attach_issue_url({:ok, result}) do
+    base_url = config(:jira_base_url, nil)
+    {:ok, Map.put(result, "url", "#{base_url}/browse/#{result["key"]}")}
+  end
+
+  defp attach_issue_url({:error, _reason} = err), do: err
+
   defp find_transition(transitions, status_name) do
-    case Enum.find(transitions, fn t ->
-           to_name = get_in(t, ["to", "name"]) || ""
-           String.downcase(to_name) == String.downcase(status_name)
-         end) do
+    case Enum.find(transitions, &matches_status?(&1, status_name)) do
       nil -> {:error, "Cannot transition to '#{status_name}'"}
       target -> {:ok, target}
     end
+  end
+
+  defp matches_status?(transition, status_name) do
+    to_name = get_in(transition, ["to", "name"]) || ""
+    String.downcase(to_name) == String.downcase(status_name)
   end
 
   defp jira_get(client, path, params \\ []) do
