@@ -122,7 +122,7 @@ defmodule Zexbox.AutoEscalationTest do
     end
   end
 
-  describe "handle_error/5 — when disabled" do
+  describe "handle_error/9 — when disabled" do
     test "returns {:disabled, nil} without calling Jira" do
       Application.put_env(:zexbox, :auto_escalation_enabled, false)
 
@@ -136,7 +136,7 @@ defmodule Zexbox.AutoEscalationTest do
     end
   end
 
-  describe "handle_error/5 — new ticket path" do
+  describe "handle_error/9 — new ticket path" do
     test "returns {:ok, ticket} and calls create_issue" do
       with_mocks(all_mocks()) do
         assert {:ok, ticket} =
@@ -217,8 +217,15 @@ defmodule Zexbox.AutoEscalationTest do
 
     test "uses custom fingerprint override when provided" do
       with_mocks(all_mocks(capture_create_issue())) do
-        AutoEscalation.handle_error(error(), "checkout", "High", "Ops",
-          fingerprint: "custom::fingerprint"
+        AutoEscalation.handle_error(
+          error(),
+          "checkout",
+          "High",
+          "Ops",
+          nil,
+          %{},
+          %{},
+          "custom::fingerprint"
         )
 
         assert_received {:create_opts, opts}
@@ -228,9 +235,14 @@ defmodule Zexbox.AutoEscalationTest do
 
     test "description is a valid ADF doc map" do
       with_mocks(all_mocks(capture_create_issue())) do
-        AutoEscalation.handle_error(error(), "pay", "Medium", "Payments",
-          user_context: %{email: "u@example.com"},
-          additional_context: %{basket_id: 123}
+        AutoEscalation.handle_error(
+          error(),
+          "pay",
+          "Medium",
+          "Payments",
+          nil,
+          %{email: "u@example.com"},
+          %{basket_id: 123}
         )
 
         assert_received {:create_opts, opts}
@@ -272,7 +284,7 @@ defmodule Zexbox.AutoEscalationTest do
     end
   end
 
-  describe "handle_error/5 — existing ticket path" do
+  describe "handle_error/9 — existing ticket path" do
     test "returns the existing ticket and adds a comment" do
       jira_overrides = [
         search_latest_issues: fn _jql, _project_key -> {:ok, [@existing_ticket]} end
@@ -322,7 +334,7 @@ defmodule Zexbox.AutoEscalationTest do
     end
   end
 
-  describe "handle_error/5 — search failure" do
+  describe "handle_error/9 — search failure" do
     test "logs and falls through to create a new ticket when search fails" do
       jira_overrides = [
         search_latest_issues: fn _jql, _project_key -> {:error, "Search failed"} end

@@ -22,9 +22,9 @@ defmodule Zexbox.AutoEscalation do
         "checkout",
         "High",
         "Purchase Ops",
-        stacktrace: __STACKTRACE__,
-        user_context: %{email: user.email},
-        additional_context: %{basket_id: basket.id}
+        __STACKTRACE__,
+        %{email: user.email},
+        %{basket_id: basket.id}
       )
   end
   ```
@@ -54,9 +54,9 @@ defmodule Zexbox.AutoEscalation do
   ```
   """
 
-  require Logger
+  alias Zexbox.{AutoEscalation.AdfBuilder, JiraClient}
 
-  alias Zexbox.{JiraClient, AutoEscalation.AdfBuilder}
+  require Logger
 
   defmodule Error do
     @moduledoc "Raised when Jira ticket creation or transition fails."
@@ -80,18 +80,47 @@ defmodule Zexbox.AutoEscalation do
   - `priority` – Jira priority name (e.g. `"High"`).
   - `zigl_team` – value for the ZIGL Team custom field.
 
-  Optional options:
-  - `:stacktrace` – pass `__STACKTRACE__` from the rescue block for a full trace.
-  - `:user_context` – map rendered as a bullet list in the ticket body.
-  - `:additional_context` – map of extra key/value pairs in the ticket body.
-  - `:fingerprint` – override deduplication key; defaults to `"action::ErrorClass"`.
-  - `:custom_description` – string rendered above Error Details (split on `\\n\\n`).
+  Optional arguments (all default to `nil` or empty):
+  - `stacktrace` – pass `__STACKTRACE__` from the rescue block for a full trace.
+  - `user_context` – map rendered as a bullet list in the ticket body.
+  - `additional_context` – map of extra key/value pairs in the ticket body.
+  - `fingerprint` – override deduplication key; auto-generated as `"action::ErrorClass"` when `nil`.
+  - `custom_description` – string rendered above Error Details (split on `\\n\\n`).
   """
-  @spec handle_error(Exception.t(), String.t(), String.t(), String.t(), keyword()) ::
-          {:ok, map()} | {:error, term()} | {:disabled, nil}
-  def handle_error(error, action, priority, zigl_team, opts \\ []) do
+  @spec handle_error(
+          Exception.t(),
+          String.t(),
+          String.t(),
+          String.t(),
+          Exception.stacktrace() | nil,
+          map(),
+          map(),
+          String.t() | nil,
+          String.t() | nil
+        ) :: {:ok, map()} | {:error, term()} | {:disabled, nil}
+  def handle_error(
+        error,
+        action,
+        priority,
+        zigl_team,
+        stacktrace \\ nil,
+        user_context \\ %{},
+        additional_context \\ %{},
+        fingerprint \\ nil,
+        custom_description \\ nil
+      ) do
     if auto_escalation_enabled?() do
-      do_handle_error(error, action, priority, zigl_team, opts)
+      do_handle_error(
+        error,
+        action,
+        priority,
+        zigl_team,
+        stacktrace,
+        user_context,
+        additional_context,
+        fingerprint,
+        custom_description
+      )
     else
       {:disabled, nil}
     end
@@ -110,21 +139,23 @@ defmodule Zexbox.AutoEscalation do
 
   # --- Private ---
 
-  defp do_handle_error(error, action, priority, zigl_team, opts) do
+  defp do_handle_error(
+         error,
+         action,
+         priority,
+         zigl_team,
+         stacktrace,
+         user_context,
+         additional_context,
+         fingerprint_override,
+         custom_description
+       ) do
     unless is_exception(error) do
       raise ArgumentError, "Expected an Exception.t() for :error, got: #{inspect(error)}"
     end
 
-    user_context = Keyword.get(opts, :user_context, %{})
-    additional_context = Keyword.get(opts, :additional_context, %{})
-    stacktrace = Keyword.get(opts, :stacktrace)
-    custom_description = Keyword.get(opts, :custom_description)
-
     error_class = inspect(error.__struct__)
-
-    fingerprint =
-      Keyword.get(opts, :fingerprint) ||
-        generate_fingerprint(error_class, action)
+    fingerprint = fingerprint_override || generate_fingerprint(error_class, action)
 
     case find_existing_ticket(fingerprint) do
       nil ->
@@ -166,7 +197,7 @@ defmodule Zexbox.AutoEscalation do
       {:ok, []} ->
         nil
 
-      {:ok, [first | _]} ->
+      {:ok, [first | _rest]} ->
         first
 
       {:error, e} ->
@@ -215,7 +246,7 @@ defmodule Zexbox.AutoEscalation do
              priority,
              custom_fields
            ),
-         {:ok, _} <- JiraClient.transition_issue(result["key"], @transition_to) do
+         {:ok, _resp} <- JiraClient.transition_issue(result["key"], @transition_to) do
       {:ok, result}
     else
       {:error, e} ->
@@ -249,7 +280,7 @@ defmodule Zexbox.AutoEscalation do
       )
 
     case JiraClient.add_comment(issue_key, comment) do
-      {:ok, _} ->
+      {:ok, _resp} ->
         :ok
 
       {:error, e} ->
