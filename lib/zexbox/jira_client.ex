@@ -44,11 +44,11 @@ defmodule Zexbox.JiraClient do
 
     client = build_client()
 
-    case jira_post(client, "/rest/api/3/search/jql", %{
-           "jql" => query,
-           "maxResults" => 50,
-           "fields" => ["key", "id", "self", "status", "summary"]
-         }) do
+    case jira_get(client, "/rest/api/3/issue/search",
+           jql: query,
+           maxResults: 50,
+           fields: ["key", "id", "self", "status", "summary"]
+         ) do
       {:ok, body} ->
         base_url = config(:jira_base_url, nil)
         issues = Map.get(body, "issues", [])
@@ -135,8 +135,6 @@ defmodule Zexbox.JiraClient do
     client = build_client()
     jira_post(client, "/rest/api/3/issue/#{issue_key}/comment", %{"body" => comment})
   end
-
-  # --- Private helpers ---
 
   defp find_transition(transitions, status_name) do
     case Enum.find(transitions, fn t ->

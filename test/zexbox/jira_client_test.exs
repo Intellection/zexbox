@@ -36,7 +36,7 @@ defmodule Zexbox.JiraClientTest do
   describe "search_latest_issues/2" do
     test_with_mock "returns issues with url keys added on success", Req,
       new: fn _opts -> :mock_client end,
-      post: fn :mock_client, _opts ->
+      get: fn :mock_client, _opts ->
         {:ok,
          %{
            status: 200,
@@ -58,7 +58,7 @@ defmodule Zexbox.JiraClientTest do
 
     test_with_mock "returns empty list when no issues found", Req,
       new: fn _opts -> :mock_client end,
-      post: fn :mock_client, _opts ->
+      get: fn :mock_client, _opts ->
         {:ok, %{status: 200, body: %{"issues" => []}}}
       end do
       assert {:ok, []} = JiraClient.search_latest_issues("status = Open")
@@ -66,7 +66,7 @@ defmodule Zexbox.JiraClientTest do
 
     test_with_mock "returns error on non-2xx response", Req,
       new: fn _opts -> :mock_client end,
-      post: fn :mock_client, _opts ->
+      get: fn :mock_client, _opts ->
         {:ok, %{status: 401, body: %{"message" => "Unauthorized"}}}
       end do
       assert {:error, reason} = JiraClient.search_latest_issues("status = Open")
@@ -75,7 +75,7 @@ defmodule Zexbox.JiraClientTest do
 
     test_with_mock "returns error on request failure", Req,
       new: fn _opts -> :mock_client end,
-      post: fn :mock_client, _opts ->
+      get: fn :mock_client, _opts ->
         {:error, %{reason: :econnrefused}}
       end do
       assert {:error, _reason} = JiraClient.search_latest_issues("status = Open")
