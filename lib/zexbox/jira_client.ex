@@ -58,17 +58,19 @@ defmodule Zexbox.JiraClient do
   @spec create_issue(String.t(), String.t(), map(), String.t(), String.t(), map()) ::
           {:ok, map()} | {:error, term()}
   def create_issue(project_key, summary, description, issuetype, priority, custom_fields \\ %{}) do
-    Map.merge(
-      %{
-        "project" => %{"key" => project_key},
-        "summary" => summary,
-        "description" => description,
-        "issuetype" => %{"name" => issuetype},
-        "priority" => %{"name" => priority}
-      },
-      custom_fields
-    )
-    |> post_issue()
+    fields =
+      Map.merge(
+        %{
+          "project" => %{"key" => project_key},
+          "summary" => summary,
+          "description" => description,
+          "issuetype" => %{"name" => issuetype},
+          "priority" => %{"name" => priority}
+        },
+        custom_fields
+      )
+
+    post_issue(fields)
   end
 
   @doc """
@@ -103,10 +105,9 @@ defmodule Zexbox.JiraClient do
   Returns `{:ok, comment_map}` or `{:error, reason}`.
   """
   @spec add_comment(String.t(), map()) :: {:ok, map()} | {:error, term()}
-  def add_comment(issue_key, comment) do
-    client = build_client()
-    jira_post(client, "/rest/api/3/issue/#{issue_key}/comment", %{"body" => comment})
-  end
+  def add_comment(issue_key, comment), do: post_comment(issue_key, comment)
+
+  # --- Private ---
 
   defp build_query(jql, nil), do: jql
   defp build_query(jql, project_key), do: "project = #{project_key} AND #{jql}"
@@ -127,20 +128,24 @@ defmodule Zexbox.JiraClient do
     |> attach_issue_url()
   end
 
+  defp post_comment(issue_key, comment) do
+    build_client()
+    |> jira_post("/rest/api/3/issue/#{issue_key}/comment", %{"body" => comment})
+  end
+
   defp attach_issue_urls({:ok, body}) do
-    base_url = config(:jira_base_url, nil)
     issues = Map.get(body, "issues", [])
-    {:ok, Enum.map(issues, &Map.put(&1, "url", "#{base_url}/browse/#{&1["key"]}"))}
+    {:ok, Enum.map(issues, &Map.put(&1, "url", browse_url(&1["key"])))}
   end
 
   defp attach_issue_urls({:error, _reason} = err), do: err
 
-  defp attach_issue_url({:ok, result}) do
-    base_url = config(:jira_base_url, nil)
-    {:ok, Map.put(result, "url", "#{base_url}/browse/#{result["key"]}")}
-  end
+  defp attach_issue_url({:ok, result}),
+    do: {:ok, Map.put(result, "url", browse_url(result["key"]))}
 
   defp attach_issue_url({:error, _reason} = err), do: err
+
+  defp browse_url(key), do: "#{config(:jira_base_url, nil)}/browse/#{key}"
 
   defp find_transition(transitions, status_name) do
     case Enum.find(transitions, &matches_status?(&1, status_name)) do
@@ -150,43 +155,35 @@ defmodule Zexbox.JiraClient do
   end
 
   defp matches_status?(transition, status_name) do
-    to_name = get_in(transition, ["to", "name"]) || ""
+    to_name = get_in(transition, ["to", "name"]) |> to_string()
     String.downcase(to_name) == String.downcase(status_name)
   end
 
   defp jira_get(client, path, params \\ []) do
-    case Req.get(client, url: path, params: params) do
-      {:ok, %{status: status, body: body}} when status in 200..299 ->
-        {:ok, body || %{}}
-
-      {:ok, %{status: status, body: body}} ->
-        {:error, "HTTP #{status}: #{inspect(body)}"}
-
-      {:error, reason} ->
-        {:error, inspect(reason)}
-    end
+    Req.get(client, url: path, params: params)
+    |> handle_response()
   end
 
   defp jira_post(client, path, body) do
-    case Req.post(client, url: path, json: body) do
-      {:ok, %{status: status, body: resp_body}} when status in 200..299 ->
-        {:ok, resp_body || %{}}
-
-      {:ok, %{status: status, body: resp_body}} ->
-        {:error, "HTTP #{status}: #{inspect(resp_body)}"}
-
-      {:error, reason} ->
-        {:error, inspect(reason)}
-    end
+    Req.post(client, url: path, json: body)
+    |> handle_response()
   end
 
+  defp handle_response({:ok, %{status: status, body: body}}) when status in 200..299,
+    do: {:ok, body || %{}}
+
+  defp handle_response({:ok, %{status: status, body: body}}),
+    do: {:error, "HTTP #{status}: #{inspect(body)}"}
+
+  defp handle_response({:error, reason}),
+    do: {:error, inspect(reason)}
+
   defp build_client do
-    base_url = config(:jira_base_url, nil)
     email = config(:jira_email, System.get_env("JIRA_USER_EMAIL_ADDRESS", ""))
     token = config(:jira_api_token, System.get_env("JIRA_API_TOKEN", ""))
 
     Req.new(
-      base_url: base_url,
+      base_url: config(:jira_base_url, nil),
       auth: {:basic, "#{email}:#{token}"},
       headers: [{"accept", "application/json"}]
     )
