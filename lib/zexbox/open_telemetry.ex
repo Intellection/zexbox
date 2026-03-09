@@ -34,20 +34,15 @@ defmodule Zexbox.OpenTelemetry do
   end
 
   @doc """
-  Returns a Grafana Tempo trace URL for the current span, or `nil` if no active span.
-  Returns a local Jaeger URL when `app_env` is `:dev` / `:development`.
+  Returns a Grafana Tempo trace URL for the current span, or `nil` if no active span
+  or if the environment is not `:production` or `:sandbox`.
   """
   @spec generate_trace_url() :: String.t() | nil
   def generate_trace_url do
-    if valid_active_span?() do
+    if valid_active_span?() && app_env() in [:production, :sandbox] do
       trace_id = hex_trace_id()
-
-      if app_env() in [:dev, :development] do
-        "http://localhost:16686/trace/#{trace_id}"
-      else
-        pane_json = build_pane_json(trace_id)
-        "https://zappi.grafana.net/explore?schemaVersion=1&panes=#{Jason.encode!(pane_json)}"
-      end
+      pane_json = build_pane_json(trace_id)
+      "https://zappi.grafana.net/explore?schemaVersion=1&panes=#{Jason.encode!(pane_json)}"
     end
   rescue
     _e -> nil

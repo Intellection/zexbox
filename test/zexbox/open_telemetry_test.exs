@@ -87,21 +87,11 @@ defmodule Zexbox.OpenTelemetryTest do
       end)
     end
 
-    test "returns a local Jaeger URL in :dev environment" do
+    test "returns nil in non-production environments" do
       Application.put_env(:zexbox, :app_env, :dev)
 
       with_active_span(fn ->
-        url = OpenTelemetry.generate_trace_url()
-        assert url == "http://localhost:16686/trace/#{@mock_trace_id_hex}"
-      end)
-    end
-
-    test "returns a local Jaeger URL in :development environment" do
-      Application.put_env(:zexbox, :app_env, :development)
-
-      with_active_span(fn ->
-        url = OpenTelemetry.generate_trace_url()
-        assert url == "http://localhost:16686/trace/#{@mock_trace_id_hex}"
+        assert OpenTelemetry.generate_trace_url() == nil
       end)
     end
 
