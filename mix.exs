@@ -4,7 +4,7 @@ defmodule Zexbox.MixProject do
   def project do
     [
       app: :zexbox,
-      version: "1.5.1",
+      version: "1.5.2",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       dialyzer: [plt_add_apps: [:mix, :ex_unit]],
@@ -40,6 +40,7 @@ defmodule Zexbox.MixProject do
       {:ldclient, "~> 3.8.0", hex: :launchdarkly_server_sdk},
       {:mix_audit, "~> 2.0", only: [:dev, :test], runtime: false},
       {:mock, "~> 0.3.0", only: :test},
+      {:req, "~> 0.5"},
       {:sobelow, "~> 0.8", only: [:dev, :test]},
       {:telemetry, "~> 1.3"}
     ]
