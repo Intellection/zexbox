@@ -37,14 +37,9 @@ defmodule Zexbox.AutoEscalation.AdfBuilder do
         stacktrace \\ nil,
         custom_description \\ nil
       ) do
-    content =
-      [telemetry_paragraph()] ++
-        optional_description_blocks(custom_description) ++
-        context_blocks(user_context, additional_context) ++
-        [heading(3, "Error Details")] ++
-        error_details_blocks(exception, stacktrace)
-
-    doc(content)
+    []
+    |> build_body(exception, user_context, additional_context, stacktrace, custom_description)
+    |> doc()
   end
 
   @doc """
@@ -74,21 +69,29 @@ defmodule Zexbox.AutoEscalation.AdfBuilder do
         stacktrace \\ nil,
         custom_description \\ nil
       ) do
-    content =
-      [heading(2, "Additional Occurrence (#{action})"), telemetry_paragraph()] ++
-        optional_description_blocks(custom_description) ++
-        context_blocks(user_context, additional_context) ++
-        [heading(3, "Error Details")] ++
-        error_details_blocks(exception, stacktrace)
-
-    doc(content)
+    [heading(2, "Additional Occurrence (#{action})")]
+    |> build_body(exception, user_context, additional_context, stacktrace, custom_description)
+    |> doc()
   end
 
   # --- Private ---
 
-  defp doc(content), do: %{version: 1, type: "doc", content: content}
+  defp build_body(
+         acc,
+         exception,
+         user_context,
+         additional_context,
+         stacktrace,
+         custom_description
+       ) do
+    acc
+    |> append_telemetry()
+    |> append_description(custom_description)
+    |> append_context(user_context, additional_context)
+    |> append_error_details(exception, stacktrace)
+  end
 
-  defp telemetry_paragraph do
+  defp append_telemetry(acc) do
     trace_url = OpenTelemetry.generate_trace_url()
     kibana_url = OpenTelemetry.kibana_log_url()
 
@@ -97,49 +100,33 @@ defmodule Zexbox.AutoEscalation.AdfBuilder do
         [text(" | ")] ++
         link_or_plain("Kibana Logs", kibana_url)
 
-    %{type: "paragraph", content: inline}
+    acc ++ [%{type: "paragraph", content: inline}]
   end
 
-  defp link_or_plain(label, url) when is_binary(url) and url != "" do
-    [%{type: "text", text: label, marks: [%{type: "link", attrs: %{href: url}}]}]
-  end
+  defp append_description(acc, nil), do: acc
+  defp append_description(acc, ""), do: acc
 
-  defp link_or_plain(label, _url) do
-    [%{type: "text", text: "#{label} (Missing)"}]
-  end
-
-  defp text(str), do: %{type: "text", text: str}
-  defp bold(str), do: %{type: "text", text: to_string(str), marks: [%{type: "strong"}]}
-  defp divider, do: %{type: "rule"}
-
-  defp heading(level, text_content),
-    do: %{type: "heading", attrs: %{level: level}, content: [text(text_content)]}
-
-  defp code_block(content),
-    do: %{type: "codeBlock", content: [%{type: "text", text: to_string(content)}]}
-
-  defp expand(title, content_blocks),
-    do: %{type: "expand", attrs: %{title: title}, content: content_blocks}
-
-  defp optional_description_blocks(nil), do: []
-  defp optional_description_blocks(""), do: []
-
-  defp optional_description_blocks(desc) do
+  defp append_description(acc, desc) do
     case String.trim(desc) do
-      "" -> []
-      trimmed -> [divider() | custom_description_blocks(trimmed)]
+      "" -> acc
+      trimmed -> acc ++ [divider() | custom_description_blocks(trimmed)]
     end
   end
 
-  defp custom_description_blocks(desc) do
-    desc
-    |> String.split(~r/\n\n+/)
-    |> Enum.map(fn paragraph ->
-      %{type: "paragraph", content: [text(String.trim(paragraph))]}
-    end)
+  defp append_context(acc, user_context, additional_context) do
+    acc
+    |> append_single_context("User Context", user_context)
+    |> append_single_context("Additional Context", additional_context)
   end
 
-  defp error_details_blocks(exception, stacktrace) do
+  defp append_single_context(acc, _label, ctx) when not is_map(ctx), do: acc
+  defp append_single_context(acc, _label, ctx) when map_size(ctx) == 0, do: acc
+
+  defp append_single_context(acc, label, ctx) do
+    acc ++ [%{type: "paragraph", content: [bold(label)]}, key_value_bullet_list(ctx)]
+  end
+
+  defp append_error_details(acc, exception, stacktrace) do
     error_class = inspect(exception.__struct__)
     message = Exception.message(exception)
     summary = "#{error_class}: #{message}"
@@ -151,22 +138,20 @@ defmodule Zexbox.AutoEscalation.AdfBuilder do
         st -> Exception.format_stacktrace(st)
       end
 
-    [
-      %{type: "paragraph", content: [text(summary)]},
-      expand("Stack trace", [code_block(backtrace)])
-    ]
+    acc ++
+      [
+        heading(3, "Error Details"),
+        %{type: "paragraph", content: [text(summary)]},
+        expand("Stack trace", [code_block(backtrace)])
+      ]
   end
 
-  defp context_blocks(user_context, additional_context) do
-    single_context_blocks("User Context", user_context) ++
-      single_context_blocks("Additional Context", additional_context)
-  end
-
-  defp single_context_blocks(_label, ctx) when not is_map(ctx), do: []
-  defp single_context_blocks(_label, ctx) when map_size(ctx) == 0, do: []
-
-  defp single_context_blocks(label, ctx) do
-    [%{type: "paragraph", content: [bold(label)]}, key_value_bullet_list(ctx)]
+  defp custom_description_blocks(desc) do
+    desc
+    |> String.split(~r/\n\n+/)
+    |> Enum.map(fn paragraph ->
+      %{type: "paragraph", content: [text(String.trim(paragraph))]}
+    end)
   end
 
   defp key_value_bullet_list(hash) do
@@ -184,5 +169,27 @@ defmodule Zexbox.AutoEscalation.AdfBuilder do
       end)
 
     %{type: "bulletList", content: items}
+  end
+
+  defp doc(content), do: %{version: 1, type: "doc", content: content}
+  defp text(str), do: %{type: "text", text: str}
+  defp bold(str), do: %{type: "text", text: to_string(str), marks: [%{type: "strong"}]}
+  defp divider, do: %{type: "rule"}
+
+  defp heading(level, text_content),
+    do: %{type: "heading", attrs: %{level: level}, content: [text(text_content)]}
+
+  defp code_block(content),
+    do: %{type: "codeBlock", content: [%{type: "text", text: to_string(content)}]}
+
+  defp expand(title, content_blocks),
+    do: %{type: "expand", attrs: %{title: title}, content: content_blocks}
+
+  defp link_or_plain(label, url) when is_binary(url) and url != "" do
+    [%{type: "text", text: label, marks: [%{type: "link", attrs: %{href: url}}]}]
+  end
+
+  defp link_or_plain(label, _url) do
+    [%{type: "text", text: "#{label} (Missing)"}]
   end
 end
