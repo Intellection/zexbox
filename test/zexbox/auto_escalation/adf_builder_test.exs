@@ -85,7 +85,11 @@ defmodule Zexbox.AutoEscalation.AdfBuilderTest do
     test "includes custom_description paragraphs above Error Details" do
       with_all_urls(fn ->
         result =
-          AdfBuilder.build_description(runtime_error(), %{}, %{}, nil,
+          AdfBuilder.build_description(
+            runtime_error(),
+            %{},
+            %{},
+            nil,
             "This happened during sync."
           )
 
@@ -102,9 +106,7 @@ defmodule Zexbox.AutoEscalation.AdfBuilderTest do
     test "splits custom_description on double newlines into multiple paragraphs" do
       with_all_urls(fn ->
         result =
-          AdfBuilder.build_description(runtime_error(), %{}, %{}, nil,
-            "First.\n\nSecond."
-          )
+          AdfBuilder.build_description(runtime_error(), %{}, %{}, nil, "First.\n\nSecond.")
 
         json = Jason.encode!(result)
         assert json =~ "First."
@@ -115,9 +117,7 @@ defmodule Zexbox.AutoEscalation.AdfBuilderTest do
     test "adds a divider before custom_description when present" do
       with_all_urls(fn ->
         result =
-          AdfBuilder.build_description(runtime_error(), %{}, %{}, nil,
-            "Some context."
-          )
+          AdfBuilder.build_description(runtime_error(), %{}, %{}, nil, "Some context.")
 
         json = Jason.encode!(result)
         assert json =~ ~s("type":"rule")

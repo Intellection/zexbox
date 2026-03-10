@@ -30,7 +30,13 @@ defmodule Zexbox.AutoEscalation.AdfBuilder do
           Exception.stacktrace() | nil,
           String.t() | nil
         ) :: map()
-  def build_description(exception, user_context, additional_context, stacktrace \\ nil, custom_description \\ nil) do
+  def build_description(
+        exception,
+        user_context,
+        additional_context,
+        stacktrace \\ nil,
+        custom_description \\ nil
+      ) do
     content =
       [telemetry_paragraph()] ++
         optional_description_blocks(custom_description) ++
@@ -60,7 +66,14 @@ defmodule Zexbox.AutoEscalation.AdfBuilder do
           Exception.stacktrace() | nil,
           String.t() | nil
         ) :: map()
-  def build_comment(exception, action, user_context, additional_context, stacktrace \\ nil, custom_description \\ nil) do
+  def build_comment(
+        exception,
+        action,
+        user_context,
+        additional_context,
+        stacktrace \\ nil,
+        custom_description \\ nil
+      ) do
     content =
       [heading(2, "Additional Occurrence (#{action})"), telemetry_paragraph()] ++
         optional_description_blocks(custom_description) ++
