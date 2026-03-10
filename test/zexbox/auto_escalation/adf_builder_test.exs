@@ -75,7 +75,7 @@ defmodule Zexbox.AutoEscalation.AdfBuilderTest do
     test "formats provided stacktrace in the expand block" do
       with_all_urls(fn ->
         stacktrace = [{MyModule, :my_fn, 2, [file: ~c"lib/my_module.ex", line: 42]}]
-        result = AdfBuilder.build_description(runtime_error(), %{}, %{}, stacktrace: stacktrace)
+        result = AdfBuilder.build_description(runtime_error(), %{}, %{}, stacktrace)
         json = Jason.encode!(result)
         assert json =~ "Stack trace"
         assert json =~ "my_module.ex"
@@ -85,8 +85,8 @@ defmodule Zexbox.AutoEscalation.AdfBuilderTest do
     test "includes custom_description paragraphs above Error Details" do
       with_all_urls(fn ->
         result =
-          AdfBuilder.build_description(runtime_error(), %{}, %{},
-            custom_description: "This happened during sync."
+          AdfBuilder.build_description(runtime_error(), %{}, %{}, nil,
+            "This happened during sync."
           )
 
         json = Jason.encode!(result)
@@ -102,8 +102,8 @@ defmodule Zexbox.AutoEscalation.AdfBuilderTest do
     test "splits custom_description on double newlines into multiple paragraphs" do
       with_all_urls(fn ->
         result =
-          AdfBuilder.build_description(runtime_error(), %{}, %{},
-            custom_description: "First.\n\nSecond."
+          AdfBuilder.build_description(runtime_error(), %{}, %{}, nil,
+            "First.\n\nSecond."
           )
 
         json = Jason.encode!(result)
@@ -115,8 +115,8 @@ defmodule Zexbox.AutoEscalation.AdfBuilderTest do
     test "adds a divider before custom_description when present" do
       with_all_urls(fn ->
         result =
-          AdfBuilder.build_description(runtime_error(), %{}, %{},
-            custom_description: "Some context."
+          AdfBuilder.build_description(runtime_error(), %{}, %{}, nil,
+            "Some context."
           )
 
         json = Jason.encode!(result)

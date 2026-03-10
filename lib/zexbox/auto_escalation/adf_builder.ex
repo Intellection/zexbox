@@ -15,7 +15,7 @@ defmodule Zexbox.AutoEscalation.AdfBuilder do
   Builds an ADF description map for a new Jira issue.
 
   Structure:
-  1. Telemetry links (Datadog | Tempo | Kibana)
+  1. Telemetry links (Tempo | Kibana)
   2. Divider (if `custom_description` present)
   3. Custom description paragraphs (split on `\\n\\n`)
   4. User context bullet list (if non-empty)
@@ -27,19 +27,16 @@ defmodule Zexbox.AutoEscalation.AdfBuilder do
           Exception.t(),
           map(),
           map(),
-          keyword()
+          Exception.stacktrace() | nil,
+          String.t() | nil
         ) :: map()
-  def build_description(exception, user_context, additional_context, opts \\ []) do
-    custom_description = Keyword.get(opts, :custom_description)
-    stacktrace = Keyword.get(opts, :stacktrace)
-
+  def build_description(exception, user_context, additional_context, stacktrace \\ nil, custom_description \\ nil) do
     content =
-      [telemetry_paragraph()]
-      |> add_if(has_content?(custom_description), divider())
-      |> Kernel.++(custom_description_blocks(custom_description))
-      |> Kernel.++(context_blocks(user_context, additional_context))
-      |> Kernel.++([heading(3, "Error Details")])
-      |> Kernel.++(error_details_blocks(exception, stacktrace))
+      [telemetry_paragraph()] ++
+        optional_description_blocks(custom_description) ++
+        context_blocks(user_context, additional_context) ++
+        [heading(3, "Error Details")] ++
+        error_details_blocks(exception, stacktrace)
 
     doc(content)
   end
@@ -60,19 +57,16 @@ defmodule Zexbox.AutoEscalation.AdfBuilder do
           String.t(),
           map(),
           map(),
-          keyword()
+          Exception.stacktrace() | nil,
+          String.t() | nil
         ) :: map()
-  def build_comment(exception, action, user_context, additional_context, opts \\ []) do
-    custom_description = Keyword.get(opts, :custom_description)
-    stacktrace = Keyword.get(opts, :stacktrace)
-
+  def build_comment(exception, action, user_context, additional_context, stacktrace \\ nil, custom_description \\ nil) do
     content =
-      [heading(2, "Additional Occurrence (#{action})"), telemetry_paragraph()]
-      |> add_if(has_content?(custom_description), divider())
-      |> Kernel.++(custom_description_blocks(custom_description))
-      |> Kernel.++(context_blocks(user_context, additional_context))
-      |> Kernel.++([heading(3, "Error Details")])
-      |> Kernel.++(error_details_blocks(exception, stacktrace))
+      [heading(2, "Additional Occurrence (#{action})"), telemetry_paragraph()] ++
+        optional_description_blocks(custom_description) ++
+        context_blocks(user_context, additional_context) ++
+        [heading(3, "Error Details")] ++
+        error_details_blocks(exception, stacktrace)
 
     doc(content)
   end
@@ -114,12 +108,18 @@ defmodule Zexbox.AutoEscalation.AdfBuilder do
   defp expand(title, content_blocks),
     do: %{type: "expand", attrs: %{title: title}, content: content_blocks}
 
-  defp custom_description_blocks(nil), do: []
-  defp custom_description_blocks(""), do: []
+  defp optional_description_blocks(nil), do: []
+  defp optional_description_blocks(""), do: []
 
-  defp custom_description_blocks(custom_description) do
-    custom_description
-    |> String.trim()
+  defp optional_description_blocks(desc) do
+    case String.trim(desc) do
+      "" -> []
+      trimmed -> [divider() | custom_description_blocks(trimmed)]
+    end
+  end
+
+  defp custom_description_blocks(desc) do
+    desc
     |> String.split(~r/\n\n+/)
     |> Enum.map(fn paragraph ->
       %{type: "paragraph", content: [text(String.trim(paragraph))]}
@@ -145,18 +145,15 @@ defmodule Zexbox.AutoEscalation.AdfBuilder do
   end
 
   defp context_blocks(user_context, additional_context) do
-    []
-    |> maybe_add_context("User Context", user_context)
-    |> maybe_add_context("Additional Context", additional_context)
+    single_context_blocks("User Context", user_context) ++
+      single_context_blocks("Additional Context", additional_context)
   end
 
-  defp maybe_add_context(blocks, _label, ctx) when is_map(ctx) and map_size(ctx) == 0, do: blocks
-  defp maybe_add_context(blocks, _label, ctx) when not is_map(ctx), do: blocks
+  defp single_context_blocks(_label, ctx) when not is_map(ctx), do: []
+  defp single_context_blocks(_label, ctx) when map_size(ctx) == 0, do: []
 
-  defp maybe_add_context(blocks, label, ctx) do
-    blocks ++
-      [%{type: "paragraph", content: [bold(label)]}] ++
-      [key_value_bullet_list(ctx)]
+  defp single_context_blocks(label, ctx) do
+    [%{type: "paragraph", content: [bold(label)]}, key_value_bullet_list(ctx)]
   end
 
   defp key_value_bullet_list(hash) do
@@ -175,12 +172,4 @@ defmodule Zexbox.AutoEscalation.AdfBuilder do
 
     %{type: "bulletList", content: items}
   end
-
-  defp add_if(list, true, item), do: list ++ [item]
-  defp add_if(list, false, _item), do: list
-
-  defp has_content?(nil), do: false
-  defp has_content?(""), do: false
-  defp has_content?(str) when is_binary(str), do: String.trim(str) != ""
-  defp has_content?(_other), do: false
 end
