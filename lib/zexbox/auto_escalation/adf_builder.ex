@@ -119,11 +119,11 @@ defmodule Zexbox.AutoEscalation.AdfBuilder do
     |> append_single_context("Additional Context", additional_context)
   end
 
-  defp append_single_context(acc, _label, ctx) when not is_map(ctx), do: acc
-  defp append_single_context(acc, _label, ctx) when map_size(ctx) == 0, do: acc
+  defp append_single_context(acc, _label, context) when not is_map(context), do: acc
+  defp append_single_context(acc, _label, context) when map_size(context) == 0, do: acc
 
-  defp append_single_context(acc, label, ctx) do
-    acc ++ [%{type: "paragraph", content: [bold(label)]}, key_value_bullet_list(ctx)]
+  defp append_single_context(acc, label, context) do
+    acc ++ [%{type: "paragraph", content: [bold(label)]}, key_value_bullet_list(context)]
   end
 
   defp append_error_details(acc, exception, stacktrace) do
