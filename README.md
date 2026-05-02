@@ -143,6 +143,39 @@ Adding your own logs is as simple as calling the `Zexbox.Telementry.attach/4` (w
 Zexbox.Telemetry.attach(:my_event, [:my, :event], &MyAppHandler.my_handler/3, nil)
 ```
 
+### JSON-formatted logs for Logstash / Elasticsearch
+
+By default the Elixir Logger emits multi-line plain-text output. Filebeat
+ships every line as a separate Elasticsearch document, so a single struct
+inspection or stack trace can fan out into dozens of indexed docs. The
+`Zexbox.Logging` JSON handler swaps the default `:logger` formatter for a
+JSON one — every log event becomes a single line of JSON, so multi-line
+content collapses into one ES document at the ingest layer. This mirrors
+the behaviour of opsbox's `JsonFormatter` on the Ruby side.
+
+In `config/runtime.exs`:
+
+```elixir
+if config_env() == :prod do
+  Zexbox.Logging.install_json_handler!()
+end
+```
+
+Output (one line per event):
+
+```json
+{"time":"2026-05-02T01:23:45.678Z","severity":"info","message":"Hello","metadata":{...}}
+```
+
+To filter Logger metadata down to a specific allow-list, pass it through:
+
+```elixir
+Zexbox.Logging.install_json_handler!(metadata: [:request_id, :trace_id, :user_id])
+```
+
+See `Zexbox.Logging.JsonHandler` for the full option list, including
+redactor support for stripping sensitive metadata before serialisation.
+
 ## Metrics
 
 In order to setup metrics with InfluxDB you'll need to add the following configuration:

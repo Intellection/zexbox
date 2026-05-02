@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+- `Zexbox.Logging.install_json_handler!/1` (and the underlying
+  `Zexbox.Logging.JsonHandler`) — swaps the default `:logger` handler's
+  formatter for a JSON one wrapping `LoggerJSON.Formatters.Basic`. Mirrors
+  the Ruby-side opsbox `JsonFormatter` so Phoenix logs land in
+  Elasticsearch as one structured document per event instead of fanning
+  multi-line content out into many.
+
+### Changed
+- `:elixir` constraint bumped from `~> 1.14` to `~> 1.15` to match the
+  `logger_json` 7.x requirement.
+
+### Dependencies
+- Adds `logger_json ~> 7.0` and `jason ~> 1.4`.
+
 ## 1.5.1 - 2026-02-05
 
 - Handles cases where `$callers` and `$ancestors` may not be pids to avoid crashing metric handler.
