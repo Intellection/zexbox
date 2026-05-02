@@ -3,8 +3,7 @@ defmodule Zexbox.Logging do
   Module for logging events in Zexbox.
   """
 
-  alias Zexbox.Logging.JsonHandler
-  alias Zexbox.Logging.LogHandler
+  alias Zexbox.Logging.{JsonHandler, LogHandler}
   alias Zexbox.Telemetry
 
   @doc """
