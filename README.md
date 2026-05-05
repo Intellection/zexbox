@@ -143,6 +143,66 @@ Adding your own logs is as simple as calling the `Zexbox.Telementry.attach/4` (w
 Zexbox.Telemetry.attach(:my_event, [:my, :event], &MyAppHandler.my_handler/3, nil)
 ```
 
+### JSON-formatted logs for Logstash / Elasticsearch
+
+By default the Elixir Logger emits multi-line plain-text output. Filebeat
+ships every line as a separate Elasticsearch document, so a single struct
+inspection or stack trace can fan out into dozens of indexed docs.
+`Zexbox.Logging.JsonFormatter` returns a `:logger` formatter tuple that
+swaps the default formatter for a JSON one — every log event becomes a
+single line of JSON, so multi-line content collapses into one ES
+document at the ingest layer. This mirrors the behaviour of opsbox's
+`JsonFormatter` on the Ruby side.
+
+The configuration is declarative — `:logger` is configured before
+`Application.start/2` runs, so logs emitted during application boot use
+the formatter that has been *configured*, not one installed at runtime.
+
+In `config/runtime.exs`:
+
+```elixir
+import Config
+
+if config_env() == :prod do
+  config :logger, :default_handler,
+    formatter: Zexbox.Logging.json_formatter_config()
+end
+```
+
+Output (one line per event):
+
+```json
+{"time":"2026-05-02T01:23:45.678Z","severity":"info","message":"Hello","metadata":{...}}
+```
+
+To override the metadata allow-list or redactors:
+
+```elixir
+config :logger, :default_handler,
+  formatter:
+    Zexbox.Logging.json_formatter_config(
+      metadata: [:request_id, :trace_id, :user_id],
+      redactors: []
+    )
+```
+
+The defaults include a `RedactKeys` redactor stripping common credential
+metadata keys; see `Zexbox.Logging.JsonFormatter.default_metadata/0` and
+`default_redactors/0` for the full lists.
+
+### Encoder choice
+
+`logger_json` uses Jason as the JSON encoder by default. On Elixir 1.18+
+you can opt into the stdlib `JSON` module — set this in
+`config/config.exs` (compile-time):
+
+```elixir
+config :logger_json, encoder: JSON
+```
+
+Otherwise add `{:jason, "~> 1.4"}` to your application's deps. Zexbox
+intentionally does not pin an encoder so consumers can choose.
+
 ## Metrics
 
 In order to setup metrics with InfluxDB you'll need to add the following configuration:

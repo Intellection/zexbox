@@ -3,8 +3,28 @@ defmodule Zexbox.Logging do
   Module for logging events in Zexbox.
   """
 
-  alias Zexbox.Logging.LogHandler
+  alias Zexbox.Logging.{JsonFormatter, LogHandler}
   alias Zexbox.Telemetry
+
+  @doc """
+  Returns a `:logger` formatter tuple wrapping `LoggerJSON.Formatters.Basic`
+  with Zappi-standard defaults. Designed to be splatted into
+  `config :logger, :default_handler, formatter: ...` in `config/runtime.exs`:
+
+      if config_env() == :prod do
+        config :logger, :default_handler,
+          formatter: Zexbox.Logging.json_formatter_config()
+      end
+
+  Mirrors opsbox's Ruby-side `JsonFormatter`: every log event becomes one
+  JSON object on one line, so multi-line content (struct inspections,
+  multi-line SQL, stack traces) collapses into a single Elasticsearch
+  document at the ingest layer.
+
+  See `Zexbox.Logging.JsonFormatter` for the full option list.
+  """
+  @spec json_formatter_config(keyword()) :: {module(), map()}
+  defdelegate json_formatter_config(opts \\ []), to: JsonFormatter, as: :config
 
   @doc """
   Attaches Telemetry handlers for Phoenix controller events.
