@@ -8,19 +8,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
-- `Zexbox.Logging.install_json_handler!/1` (and the underlying
-  `Zexbox.Logging.JsonHandler`) — swaps the default `:logger` handler's
-  formatter for a JSON one wrapping `LoggerJSON.Formatters.Basic`. Mirrors
-  the Ruby-side opsbox `JsonFormatter` so Phoenix logs land in
-  Elasticsearch as one structured document per event instead of fanning
-  multi-line content out into many.
+- `Zexbox.Logging.JsonFormatter.config/1` (and the
+  `Zexbox.Logging.json_formatter_config/1` delegate) — returns a
+  `:logger` formatter tuple wrapping `LoggerJSON.Formatters.Basic` with
+  Zappi-standard metadata and redactor defaults. Designed to be splatted
+  into `config :logger, :default_handler, formatter: ...` in
+  `runtime.exs`. Mirrors the Ruby-side opsbox `JsonFormatter` so Phoenix
+  logs land in Elasticsearch as one structured document per event
+  instead of fanning multi-line content out into many.
 
 ### Changed
 - `:elixir` constraint bumped from `~> 1.14` to `~> 1.15` to match the
   `logger_json` 7.x requirement.
 
 ### Dependencies
-- Adds `logger_json ~> 7.0` and `jason ~> 1.4`.
+- Adds `logger_json ~> 7.0`.
+
+### Notes
+- This release does not pin `:jason`. Consumers may include it directly
+  (the default `LoggerJSON` encoder) or, on Elixir 1.18+, set
+  `config :logger_json, encoder: JSON` to use the stdlib `JSON` module.
 
 ## 1.5.1 - 2026-02-05
 
