@@ -92,13 +92,8 @@ defmodule Zexbox.Metrics do
   end
 
   defp resolve_enricher(args) do
-    args
-    |> enricher_from_args()
-    |> case do
-      nil -> Application.get_env(:zexbox, :metrics_enricher)
-      value -> value
-    end
-    |> normalise_enricher()
+    enricher = enricher_from_args(args) || Application.get_env(:zexbox, :metrics_enricher)
+    normalise_enricher(enricher)
   end
 
   defp enricher_from_args(args) when is_list(args), do: Keyword.get(args, :enricher)
