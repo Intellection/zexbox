@@ -17,7 +17,7 @@ defmodule Zexbox.MetricsTest do
       try do
         Supervisor.stop(Metrics)
       catch
-        :exit, _ -> :ok
+        :exit, _reason -> :ok
       end
     end)
 
