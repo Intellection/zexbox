@@ -12,6 +12,28 @@ defmodule Zexbox.Metrics.MetricHandlerTest do
     end
   end
 
+  defmodule RequesterEnricher do
+    @behaviour Zexbox.Metrics.ControllerSeriesEnricher
+
+    @impl true
+    def init(opts), do: opts
+
+    @impl true
+    def call(series, conn, _opts) do
+      ControllerSeries.field(series, :requester, conn.assigns[:api_key_description])
+    end
+  end
+
+  defmodule BoomEnricher do
+    @behaviour Zexbox.Metrics.ControllerSeriesEnricher
+
+    @impl true
+    def init(opts), do: opts
+
+    @impl true
+    def call(_series, _conn, _opts), do: raise("boom")
+  end
+
   describe "handle_event/4" do
     setup do
       start_supervised!(ContextRegistry)
@@ -104,6 +126,36 @@ defmodule Zexbox.Metrics.MetricHandlerTest do
         end)
 
       assert log =~ "Exception creating controller series:"
+    end
+
+    test "invokes the configured enricher and writes the enriched series", %{
+      event: event,
+      measurements: measurements,
+      metadata: metadata,
+      config: config
+    } do
+      metadata = put_in(metadata.conn.assigns[:api_key_description], "service-A")
+      config = Map.put(config, :enricher, {RequesterEnricher, []})
+
+      assert %ControllerSeries{fields: %ControllerSeries.Fields{requester: "service-A"}} =
+               MetricHandler.handle_event(event, measurements, metadata, config)
+    end
+
+    test "logs and falls back to the un-enriched series when the enricher raises", %{
+      event: event,
+      measurements: measurements,
+      metadata: metadata,
+      config: config
+    } do
+      config = Map.put(config, :enricher, {BoomEnricher, []})
+
+      log =
+        capture_log(fn ->
+          assert %ControllerSeries{fields: %ControllerSeries.Fields{requester: nil}} =
+                   MetricHandler.handle_event(event, measurements, metadata, config)
+        end)
+
+      assert log =~ "Exception in controller series enricher:"
     end
 
     test "does not call Connection.write when process has disabled metrics", %{
