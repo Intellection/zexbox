@@ -14,9 +14,10 @@ defmodule Zexbox.MetricsTest do
     on_exit(fn ->
       :telemetry.detach("phoenix_controller_metrics")
 
-      case Process.whereis(Metrics) do
-        nil -> :ok
-        pid -> Process.exit(pid, :normal)
+      try do
+        Supervisor.stop(Metrics)
+      catch
+        :exit, _ -> :ok
       end
     end)
 
