@@ -21,6 +21,7 @@ defmodule Zexbox.Metrics.MetricHandler do
       false ->
         measurements
         |> create_controller_series(metadata)
+        |> enrich(metadata, config)
         |> write_metric(config)
 
       true ->
@@ -31,6 +32,16 @@ defmodule Zexbox.Metrics.MetricHandler do
     exception ->
       Logger.error("Exception creating controller series: #{inspect(exception)}")
   end
+
+  defp enrich(series, %{conn: conn}, %{enricher: {module, opts}}) do
+    module.call(series, conn, opts)
+  rescue
+    exception ->
+      Logger.error("Exception in controller series enricher: #{inspect(exception)}")
+      series
+  end
+
+  defp enrich(series, _metadata, _config), do: series
 
   defp required_fields_missing?(%{conn: %{private: private}}) do
     format = Map.get(private, :phoenix_format)

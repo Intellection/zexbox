@@ -67,6 +67,17 @@ defmodule Zexbox.Metrics do
   @doc """
   Starts the metrics supervisor and attaches the controller metrics.
 
+  Accepts an optional `:enricher` to customise the controller series before it
+  is written. See `Zexbox.Metrics.ControllerSeriesEnricher`.
+
+      children = [
+        {Zexbox.Metrics, enricher: {MyApp.MetricsEnricher, []}}
+      ]
+
+  An enricher can also be set via application env
+  (`config :zexbox, :metrics_enricher, {MyApp.MetricsEnricher, []}`); the
+  `start_link/1` argument wins if both are present.
+
   ## Examples
 
         iex> Zexbox.Metrics.start_link(nil)
@@ -74,18 +85,36 @@ defmodule Zexbox.Metrics do
 
   """
   @spec start_link(args :: any()) :: Supervisor.on_start()
-  def start_link(_args) do
+  def start_link(args) do
     on_start = Supervisor.start_link(__MODULE__, nil, name: __MODULE__)
-    attach_controller_metrics()
+    attach_controller_metrics(resolve_enricher(args))
     on_start
   end
 
-  defp attach_controller_metrics do
+  defp resolve_enricher(args) do
+    enricher = enricher_from_args(args) || Application.get_env(:zexbox, :metrics_enricher)
+    normalise_enricher(enricher)
+  end
+
+  defp enricher_from_args(args) when is_list(args), do: Keyword.get(args, :enricher)
+  defp enricher_from_args(_args), do: nil
+
+  defp normalise_enricher(nil), do: nil
+
+  defp normalise_enricher({module, opts}) when is_atom(module) do
+    {module, module.init(opts)}
+  end
+
+  defp normalise_enricher(module) when is_atom(module) do
+    {module, module.init([])}
+  end
+
+  defp attach_controller_metrics(enricher) do
     Telemetry.attach(
       "phoenix_controller_metrics",
       [:phoenix, :endpoint, :stop],
       &MetricHandler.handle_event/4,
-      nil
+      %{enricher: enricher}
     )
   end
 end

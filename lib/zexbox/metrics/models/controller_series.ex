@@ -10,6 +10,9 @@ defmodule Zexbox.Metrics.ControllerSeries do
   * http_referer - The referer of the request
   * count - The number of requests
   * request_id - The request ID of the request
+  * requester - An identifier for the caller (e.g. an API key description or
+    upstream service name). Not populated by default — set it from a
+    `Zexbox.Metrics.ControllerSeriesEnricher`.
 
   The tags allowed are:
 
@@ -37,6 +40,7 @@ defmodule Zexbox.Metrics.ControllerSeries do
     field(:trace_id)
     field(:count)
     field(:request_id)
+    field(:requester)
   end
 
   @doc """
