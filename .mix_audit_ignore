@@ -1,0 +1,8 @@
+# Advisories with no upstream fix available. Reviewed and accepted; revisit when
+# a patched release ships. hackney is handled separately by package name in the
+# `audit` mix alias (its fix is only in 4.x, incompatible with instream's ~> 1.x).
+
+# cowlib (via ldclient -> shotgun -> gun): Cookie Request Header Injection in
+# cow_cookie:cookie/1. Affects >= 2.9.0; no fixed release yet.
+# https://github.com/advisories/GHSA-g2wm-735q-3f56
+GHSA-g2wm-735q-3f56
