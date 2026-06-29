@@ -56,14 +56,11 @@ jobs:
 
       - run: mix dialyzer
 
-      - name: Check for abandonded packages
-        run: mix hex.audit
-
       - name: Check outdated dependencies
         run: mix hex.outdated --within-requirements || true
 
-      - name: Check for vulnerable packages
-        run: mix hex.audit
+      - name: Run dependency audit
+        run: mix audit
 
       - name: Run tests
         run: mix test

@@ -11,6 +11,7 @@ defmodule Zexbox.MixProject do
       description: description(),
       package: package(),
       deps: deps(),
+      aliases: aliases(),
       name: "Zexbox",
       source_url: "https://github.com/Intellection/zexbox",
       test_coverage: [
@@ -42,6 +43,16 @@ defmodule Zexbox.MixProject do
       {:mock, "~> 0.3.0", only: :test},
       {:sobelow, "~> 0.8", only: [:dev, :test]},
       {:telemetry, "~> 1.3"}
+    ]
+  end
+
+  defp aliases() do
+    [
+      # Security advisory audit. hackney is ignored by name: its advisories are
+      # only fixed in 4.x, which instream (pinning it to ~> 1.x) doesn't allow.
+      # No-upstream-fix advisories (e.g. cowlib) are ignored per-advisory in the
+      # ignore file.
+      audit: ["deps.audit --ignore-file .mix_audit_ignore --ignore-package-names hackney"]
     ]
   end
 
