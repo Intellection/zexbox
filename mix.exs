@@ -37,6 +37,11 @@ defmodule Zexbox.MixProject do
       {:dialyxir, "~> 1.4.7", only: [:dev, :test], runtime: false},
       {:doctor, "~> 0.23.0", only: [:dev, :test]},
       {:ex_doc, "~> 0.40.3", only: :dev, runtime: false},
+      # instream hard-depends on hackney "~> 1.1", whose 1.x line has open
+      # advisories fixed only in 4.x. Override to a patched 4.x (drop-in for the
+      # request/5 + body/1 API instream uses). Consuming apps must repeat this
+      # top-level override — Mix ignores :override in nested deps.
+      {:hackney, "~> 4.0", override: true},
       {:instream, "~> 2.2"},
       {:ldclient, "~> 3.11.0", hex: :launchdarkly_server_sdk},
       {:mix_audit, "~> 2.0", only: [:dev, :test], runtime: false},
@@ -48,11 +53,9 @@ defmodule Zexbox.MixProject do
 
   defp aliases() do
     [
-      # Security advisory audit. hackney is ignored by name: its advisories are
-      # only fixed in 4.x, which instream (pinning it to ~> 1.x) doesn't allow.
-      # No-upstream-fix advisories (e.g. cowlib) are ignored per-advisory in the
-      # ignore file.
-      audit: ["deps.audit --ignore-file .mix_audit_ignore --ignore-package-names hackney"]
+      # Security advisory audit. No-upstream-fix advisories are ignored
+      # per-advisory in the ignore file.
+      audit: ["deps.audit --ignore-file .mix_audit_ignore"]
     ]
   end
 

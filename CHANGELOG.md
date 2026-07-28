@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+- Override `hackney` to `~> 4.0`, resolving the open `hackney` 1.x security advisories (`ssl:connect/2` handshake timeout, CR/LF query injection, header injection, SSRF allowlist bypass) that instream pins transitively. **Consuming applications must add `{:hackney, "~> 4.0", override: true}` to their own top-level deps** — Mix ignores `:override` in nested dependencies, so once this ships, apps on the old resolution will hit a dependency-divergence error until they add the override. Removes the `--ignore-package-names hackney` workaround from the `audit` alias.
+
 ## 1.6.0 - 2026-07-23
 
 - Add `requester` field to `Zexbox.Metrics.ControllerSeries` (not populated by default).

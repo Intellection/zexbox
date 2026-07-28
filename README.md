@@ -9,7 +9,12 @@
 ```elixir
 def deps do
   [
-    {:zexbox, "~> 1.4.1"}
+    {:zexbox, "~> 1.4.1"},
+    # Required: forces the patched hackney 4.x. Zexbox pulls hackney in
+    # transitively via instream, which pins the vulnerable 1.x line. Mix only
+    # honours :override in the top-level project, so this must live in your
+    # app's deps — not just zexbox's — to clear the hackney advisories.
+    {:hackney, "~> 4.0", override: true}
   ]
 end
 ```
