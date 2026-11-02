@@ -21,8 +21,12 @@ defmodule Zexbox.MixProject do
       ],
       hex: [
         ignore_advisories: [
-          # cowlib cookie request header injection (low). No fixed release yet.
-          "GHSA-g2wm-735q-3f56",
+          # cowlib structured-header CR/LF injection: no fixed release, and nothing in the
+          # dependency tree calls cow_http_struct_hd.
+          "EEF-CVE-2026-43966",
+          # gun: false positive. The advisory records cowboy's fixed version (2.16.0) for gun
+          # too, so every gun release matches, although gun was patched in 2.4.0.
+          "GHSA-w4f7-4cxr-rv3c",
           # hackney: ignored package-wide. Its advisories are only fixed in 4.x, which
           # instream (pinned to ~> 1.x) does not allow.
           "EEF-CVE-2026-47075",
