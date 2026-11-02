@@ -11,13 +11,29 @@ defmodule Zexbox.MixProject do
       description: description(),
       package: package(),
       deps: deps(),
-      aliases: aliases(),
       name: "Zexbox",
       source_url: "https://github.com/Intellection/zexbox",
       test_coverage: [
         ignore_modules: [
           Mix.Tasks.Bump,
           Zexbox.Metrics.Connection
+        ]
+      ],
+      hex: [
+        ignore_advisories: [
+          # cowlib structured-header CR/LF injection: no fixed release, and nothing in the
+          # dependency tree calls cow_http_struct_hd.
+          "EEF-CVE-2026-43966",
+          # gun: false positive. The advisory records cowboy's fixed version (2.16.0) for gun
+          # too, so every gun release matches, although gun was patched in 2.4.0.
+          "GHSA-w4f7-4cxr-rv3c",
+          # hackney: ignored package-wide. Its advisories are only fixed in 4.x, which
+          # instream (pinned to ~> 1.x) does not allow.
+          "EEF-CVE-2026-47075",
+          "EEF-CVE-2026-47071",
+          "EEF-CVE-2026-47076",
+          "EEF-CVE-2026-47069",
+          "EEF-CVE-2026-115693"
         ]
       ]
     ]
@@ -39,20 +55,9 @@ defmodule Zexbox.MixProject do
       {:ex_doc, "~> 0.40.3", only: :dev, runtime: false},
       {:instream, "~> 2.2"},
       {:ldclient, "~> 3.11.0", hex: :launchdarkly_server_sdk},
-      {:mix_audit, "~> 2.0", only: [:dev, :test], runtime: false},
       {:mock, "~> 0.3.0", only: :test},
       {:sobelow, "~> 0.8", only: [:dev, :test]},
       {:telemetry, "~> 1.3"}
-    ]
-  end
-
-  defp aliases() do
-    [
-      # Security advisory audit. hackney is ignored by name: its advisories are
-      # only fixed in 4.x, which instream (pinning it to ~> 1.x) doesn't allow.
-      # No-upstream-fix advisories (e.g. cowlib) are ignored per-advisory in the
-      # ignore file.
-      audit: ["deps.audit --ignore-file .mix_audit_ignore --ignore-package-names hackney"]
     ]
   end
 
