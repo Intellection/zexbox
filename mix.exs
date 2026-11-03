@@ -26,14 +26,7 @@ defmodule Zexbox.MixProject do
           "EEF-CVE-2026-43966",
           # gun: false positive. The advisory records cowboy's fixed version (2.16.0) for gun
           # too, so every gun release matches, although gun was patched in 2.4.0.
-          "GHSA-w4f7-4cxr-rv3c",
-          # hackney: ignored package-wide. Its advisories are only fixed in 4.x, which
-          # instream (pinned to ~> 1.x) does not allow.
-          "EEF-CVE-2026-47075",
-          "EEF-CVE-2026-47071",
-          "EEF-CVE-2026-47076",
-          "EEF-CVE-2026-47069",
-          "EEF-CVE-2026-115693"
+          "GHSA-w4f7-4cxr-rv3c"
         ]
       ]
     ]
@@ -53,6 +46,7 @@ defmodule Zexbox.MixProject do
       {:dialyxir, "~> 1.4.7", only: [:dev, :test], runtime: false},
       {:doctor, "~> 0.23.0", only: [:dev, :test]},
       {:ex_doc, "~> 0.40.3", only: :dev, runtime: false},
+      {:hackney, "~> 1.1 or ~> 4.9", override: true, only: [:dev, :test]},
       {:instream, "~> 2.2"},
       {:ldclient, "~> 3.11.0", hex: :launchdarkly_server_sdk},
       {:mock, "~> 0.3.0", only: :test},

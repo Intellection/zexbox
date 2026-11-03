@@ -162,6 +162,20 @@ config :zexbox, Zexbox.Metrics.Connection,
 
 A more indepth explanation on the configuration can be found in the `Instream.Connection` [hexdocs](https://hexdocs.pm/instream/Instream.html).
 
+### hackney 4
+
+hackney 1.x has unfixed CVEs (e.g. CVE-2026-115693). The fixes are only in 4.x, but `instream` still requires `~> 1.1`, so your app keeps resolving 1.x unless you override it:
+
+```elixir
+{:hackney, "~> 4.9", override: true}
+```
+
+`Zexbox.Metrics.Connection` uses `Zexbox.Metrics.HTTPClient`, which works with both versions. Before overriding, check:
+
+- hackney 4 needs OTP 26+.
+- Don't set `http_client: Instream.HTTPClient.Hackney`. It breaks on hackney 4, and so does any other `Instream.Connection` in your app that uses the default client.
+- hackney 4 may negotiate HTTP/2 over TLS. Pass `http_opts: [protocols: [:http1]]` in the connection config if your InfluxDB needs HTTP/1.1.
+
 In order to make use of metrics you'll need to add the `Zexbox` module to your application's `Supervisor` tree
 
 ```elixir
