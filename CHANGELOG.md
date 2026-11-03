@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.7.0 - 2026-11-03
+
+- Add `Zexbox.Metrics.HTTPClient`, an `Instream.HTTPClient` that works with hackney 1.x and 4.x, and make it the default client for `Zexbox.Metrics.Connection`.
+- Lock hackney 4.x for zexbox's own dev/test build to clear hackney 1.x CVEs (e.g. CVE-2026-115693). Apps still resolve 1.x through instream unless they override it; see the README.
+
 ## 1.6.0 - 2026-07-23
 
 - Add `requester` field to `Zexbox.Metrics.ControllerSeries` (not populated by default).
