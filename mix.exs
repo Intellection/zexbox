@@ -46,7 +46,7 @@ defmodule Zexbox.MixProject do
       {:dialyxir, "~> 1.4.7", only: [:dev, :test], runtime: false},
       {:doctor, "~> 0.23.0", only: [:dev, :test]},
       {:ex_doc, "~> 0.40.3", only: :dev, runtime: false},
-      {:hackney, "~> 1.1 or ~> 4.9", override: true},
+      {:hackney, "~> 1.1 or ~> 4.9", override: true, only: [:dev, :test]},
       {:instream, "~> 2.2"},
       {:ldclient, "~> 3.11.0", hex: :launchdarkly_server_sdk},
       {:mock, "~> 0.3.0", only: :test},
