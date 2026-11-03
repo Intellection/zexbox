@@ -49,6 +49,7 @@ defmodule Zexbox.MixProject do
       {:hackney, "~> 1.1 or ~> 4.9", override: true, only: [:dev, :test]},
       {:instream, "~> 2.2"},
       {:ldclient, "~> 3.11.0", hex: :launchdarkly_server_sdk},
+      {:logger_json, "~> 7.0", optional: true},
       {:mock, "~> 0.3.0", only: :test},
       {:sobelow, "~> 0.8", only: [:dev, :test]},
       {:telemetry, "~> 1.3"}

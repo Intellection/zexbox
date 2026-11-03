@@ -143,6 +143,40 @@ Adding your own logs is as simple as calling the `Zexbox.Telementry.attach/4` (w
 Zexbox.Telemetry.attach(:my_event, [:my, :event], &MyAppHandler.my_handler/3, nil)
 ```
 
+### JSON logs
+
+Filebeat ships every log line as its own Elasticsearch document, so multi-line output (struct inspections, SQL, stack traces) fans out into many documents. `Zexbox.Logging.json_formatter_config/1` returns a [`logger_json`](https://hexdocs.pm/logger_json) formatter that writes one JSON line per event, with Zappi defaults for metadata and redaction.
+
+`logger_json` is an optional dependency, so add it to your app:
+
+```elixir
+{:logger_json, "~> 7.0"}
+```
+
+Then set the formatter in `config/runtime.exs`:
+
+```elixir
+if config_env() == :prod do
+  config :logger, :default_handler,
+    formatter: Zexbox.Logging.json_formatter_config()
+end
+```
+
+It has to be `runtime.exs`: `config.exs` and `prod.exs` are evaluated before dependencies are compiled, so the function isn't available there. Setting it in config also means boot logs are JSON too.
+
+Any `LoggerJSON.Formatters.Basic.new/1` option can be passed, and replaces the default for that key:
+
+```elixir
+Zexbox.Logging.json_formatter_config(metadata: [:request_id, :user_id, :order_id])
+```
+
+See `Zexbox.Logging.JsonFormatter.default_metadata/0` and `default_redactors/0` for the defaults. A few things to know:
+
+- Trace and span IDs are written as top-level `trace` and `span` fields, not under `metadata`.
+- Redaction matches exact metadata key names. It doesn't touch string log messages, so don't log credentials in the message.
+
+`logger_json` encodes with Jason by default. On Elixir 1.18+ you can use the stdlib `JSON` module instead by setting `config :logger_json, encoder: JSON` in `config/config.exs`. It's compile-time, so run `mix deps.compile logger_json --force` after changing it.
+
 ## Metrics
 
 In order to setup metrics with InfluxDB you'll need to add the following configuration:
