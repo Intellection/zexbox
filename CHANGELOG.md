@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.8.0 - 2026-11-03
+
+- Add `Zexbox.Logging.json_formatter_config/1`, which returns a `logger_json` formatter that writes one JSON line per log event with default metadata and key redaction. `logger_json` is an optional dependency; see the README.
+
 ## 1.7.0 - 2026-11-03
 
 - Add `Zexbox.Metrics.HTTPClient`, an `Instream.HTTPClient` that works with hackney 1.x and 4.x, and make it the default client for `Zexbox.Metrics.Connection`.
