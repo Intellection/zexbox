@@ -21,12 +21,6 @@ defmodule Zexbox.MixProject do
       ],
       hex: [
         ignore_advisories: [
-          # cowlib structured-header CR/LF injection: no fixed release, and nothing in the
-          # dependency tree calls cow_http_struct_hd.
-          "EEF-CVE-2026-43966",
-          # cowlib HTTP/2 HPACK amplification: no fixed release yet. Only reachable via gun in
-          # ldclient's streaming client, whose only peer is LaunchDarkly.
-          "EEF-CVE-2026-113431",
           # gun: false positive. The advisory records cowboy's fixed version (2.16.0) for gun
           # too, so every gun release matches, although gun was patched in 2.4.0.
           "GHSA-w4f7-4cxr-rv3c"
