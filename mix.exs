@@ -7,7 +7,7 @@ defmodule Zexbox.MixProject do
       version: "1.8.0",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
-      dialyzer: [plt_add_apps: [:mix, :ex_unit]],
+      dialyzer: [plt_add_apps: [:mix, :ex_unit], plt_local_path: ".plts", plt_core_path: ".plts"],
       description: description(),
       package: package(),
       deps: deps(),
