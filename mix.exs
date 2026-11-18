@@ -48,6 +48,8 @@ defmodule Zexbox.MixProject do
       {:ldclient, "~> 3.11.0", hex: :launchdarkly_server_sdk},
       {:logger_json, "~> 7.0", optional: true},
       {:mock, "~> 0.3.0", only: :test},
+      # mock pins meck 0.9, which does not compile on OTP 29.
+      {:meck, "~> 1.2", only: :test, override: true},
       {:sobelow, "~> 0.8", only: [:dev, :test]},
       {:telemetry, "~> 1.3"}
     ]
